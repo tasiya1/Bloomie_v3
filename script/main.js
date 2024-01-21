@@ -609,8 +609,8 @@ class DrawingMachine {
         window.addEventListener("mousemove", this.onMouseMove);
         window.addEventListener("mouseup", this.onMouseUp);
 
-        window.addEventListener("touchstart", this.onTouchStart);
-        window.addEventListener("touchmove", this.onTouchMove);
+        window.addEventListener("touchstart", this.onTouchStart, { passive: false });
+        window.addEventListener("touchmove", this.onTouchMove, { passive: false });
         window.addEventListener("touchend", this.onTouchEnd);
 
         this.ct.lineWidth = 1;
@@ -634,8 +634,8 @@ class DrawingMachine {
         this.marginY = groundRect.top + window.scrollY;
     }
 
-    onTouchStart(ev){ this.toolDown(ev.touches[0]) }
-    onTouchMove(ev){ this.toolOn(ev.touches[0]) }
+    onTouchStart(ev){ ev.preventDefault(); this.toolDown(ev.touches[0]) }
+    onTouchMove(ev){ ev.preventDefault(); this.toolOn(ev.touches[0]) }
     onTouchEnd(ev){ this.toolUp(ev.touches[0]) }
 
     onMouseDown(ev){ this.toolDown(ev) }
