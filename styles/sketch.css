@@ -1,0 +1,435 @@
+*{
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Overpass;/*"Candara Light";*/
+  color: #eaeaea;
+  background-color: #434343;
+}
+
+input[type="color"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  width: 40px;
+  height: 40px;
+  border: none;
+  cursor: pointer;
+}
+
+[type=color]::-webkit-color-swatch, [type=color]::-moz-color-swatch {
+  border-radius: 50%;
+}
+
+.canvas-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#layers {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+input {
+  margin: 0.4rem;
+}
+
+.section {
+  padding: 5px;
+  border-color: transparent;
+}
+
+h3{
+  margin-top: 20px;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+.nav{
+  height: 100%;
+  width: 0px;
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  left: 0;
+  /*background-image: url(design/background.png);*/
+  background: #0000008a;
+  backdrop-filter: blur(10px);
+  overflow-x: hidden;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  transition: 0.3s;
+}
+
+.layer-preview{
+  height: auto;
+  width: auto;
+  border: none;
+  outline: none;
+  margin: 5px;
+  background-color: #ffffff;
+  color: black;
+  font-weight: 600;
+  font-size: 1vw;
+  border-radius: 10%;
+  padding: 8px 8px 8px 8px;
+  transition: 0.3s;
+  display: block;
+}
+
+.layer-nav{
+  height: 100px;
+  width: 500px;
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  left: 50%;
+  background-image: url(design/background.png);
+  overflow-x: hidden;
+  display: inline-table;
+}
+
+#layer-list{
+  display: inline-block;
+}
+
+.undoredo{
+  background-color: #000000;
+  border-radius: 50%;
+}
+
+#tools-properties {
+
+}
+
+.settings{
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 4;
+  top: 0;
+  left: 0;
+  background-image: url(design/background.png);
+  overflow-x: hidden;
+  padding-top: 0px;
+  transition: 0.3s;
+  display: inline-flexbox;
+}
+
+.menuButton{
+  position:fixed;
+  z-index: 5;
+  top: 0;
+  left: 0;
+  padding-top: 0px;
+  transition: duration 0ms;
+  background-color: rgba(0,0,0,0);
+}
+
+.icon{
+  height: 30px;
+  width: 30px;
+}
+
+button{
+  border: none;
+  outline: none;
+  margin: 5px;
+  background-color: #ffffff;
+  color: #fff;
+  border-radius: 10%;
+  padding: 8px 8px 8px 8px;
+  transition: 0.3s;
+}
+
+h4{
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+.sidenav button:hover {
+  color: #f1f1f1;
+}
+
+
+.close {
+  background-color: rgba(0,0,0,0);
+  float: right;
+}
+
+.userColor{
+  margin-top: 30px;
+  height: 40px;
+  width: 40px;
+}
+
+.settings_container{
+  margin: 10px;
+  display: list-item;
+}
+
+.settings_button{
+  background-color: #000000;
+  border-radius: 50%;
+}
+
+.settings .close_settings{
+  top: 0;
+  right: 0;
+  margin: 50px;
+}
+
+button:hover{
+  transition-delay: 0.1s;
+  transform: scale(1.2);
+}
+
+/* Palette colors */
+
+.palette{
+  height: 30px;
+  width: 30px;
+  background-color: #ffffff;
+  margin: 5px;
+  /*transition: 0.3s;*/
+  border: 2px rgba(255, 255, 255, 0) solid;
+}
+
+.palette:hover{
+  /*transform: scale(1.1);*/
+  border: 2px white solid;
+}
+
+.palette-cell-container{
+  margin: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #0d0d0d79;
+}
+
+.slider {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 80%;
+  height: 10px;
+  background: #d3d3d3;
+  outline: none;
+  border-radius: 10px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%; 
+  background: #f5bfbf;
+  cursor: pointer;
+}
+
+#tools-section {
+
+}
+
+#tools-container{
+  background-color: rgba(75, 75, 75, 0.598);
+  padding: 10px;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  transition: height 0.5s;
+}
+
+.selected-tool {
+  background-color: #ff9e9eb5;
+}
+
+.folded {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.folded #tools-container {
+  visibility: hidden;
+  height: 0px;
+}
+
+.folded #showBrushes{
+  transform: rotate(180deg);
+}
+
+.tool {
+  width: 90%;
+  height: auto;
+  border-bottom: #cacaca 1px solid;
+  position:sticky;
+  margin: 5px;
+  position: relative;
+}
+
+.tool-body {
+  padding: 5px;
+  width: max-content;
+}
+
+.tool-additional {
+  padding: 0px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 5px;
+  z-index: 10;
+}
+
+#save-to-db{
+  width: 100px;
+  padding: 10px;
+  background-color: yellowgreen;
+}
+
+#save-to-db:hover{
+  transform: scale(1.1);
+}
+
+#showBrushes img{
+  transform: rotate(90deg);
+}
+
+p:hover{
+  cursor: default;
+}
+
+.tool:hover, .tool:focus{
+  /*background-blend-mode: multiply;*/
+  background-color: #f5bfbfbb;
+}
+
+.tool *{
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.tool:last-of-type{
+  border: none;
+}
+
+#paletteBar button{
+  height: auto;
+  width: auto;
+}
+
+#add_to_palette img{
+  height: 10px;
+  width: 10px;
+}
+
+#myFile{
+  height: 50px;
+  width: 100px;
+  position: relative;
+  border: 1px #cacaca solid;
+}
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.backdrop {
+  visibility: hidden;
+  position: fixed;
+  z-index: 999;
+  background-color: #000000b0;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.option-window {
+  position: fixed;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 1000;
+  background-color: white;
+  padding: 50px;
+  color: black;
+  border-radius: 20px;
+  transition: visibility 0.5s linear;
+  animation: appear 1s forwards;
+}
+
+.size-input {
+  margin: 0.4rem;
+  border: none;
+  font-size: 24pt;
+  max-width: fit-content;
+  outline: none;
+  border-bottom: 1px solid grey;
+}
+
+.option-window h1 {
+  margin-bottom: 20px;
+  font-size: 48pt;
+}
+
+#startCanvas {
+  background-color: #000000;
+  color: white;
+  font-size: 24pt;
+  width: 100%;
+  border: none;
+  border-radius: 0%;
+  margin-top: 20px;
+
+  transition: background 1s ease-out;
+}
+
+#startCanvas:hover {
+  background: linear-gradient(127deg, rgba(0,0,255,.8), rgba(255,0,0,.5) 70.71%);
+  transform: none;
+}
+
+@keyframes color-hover {
+  0% {
+    background: linear-gradient(217deg, rgba(255,0,0,.8), rgba(255,0,0,0) 70.71%);
+  }
+  50% {
+    background: linear-gradient(336deg, rgba(0,0,255,.8), rgba(0,0,255,0) 70.71%);
+
+  }
+  100% {
+    background: linear-gradient(127deg, rgba(0,255,0,.8), rgba(0,255,0,0) 70.71%);
+
+  }
+}

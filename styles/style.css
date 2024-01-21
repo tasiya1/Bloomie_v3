@@ -1,0 +1,188 @@
+*{
+    margin: 0;
+    padding: 0;
+
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.header{
+    position: sticky;
+    top: 0; 
+    padding: 20px;
+    width: 100%;
+
+}
+
+.header .logo-container{
+    margin-left: 70px;
+    float: left;
+}
+
+.header .nav{
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 70px;
+}
+
+.header .nav *{
+    margin: 0 10px;
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+}
+
+.header .nav *:hover{
+    color: antiquewhite;
+    transition: 0.2s;
+    text-decoration:overline;
+}
+
+.intro{
+    background-size: cover;
+    width: 100%;
+
+    text-align: center;
+    justify-items: center;
+
+    display: block;
+    margin: 0 auto;
+}
+
+.intro *{
+    vertical-align: middle;
+    margin: 10px;
+}
+
+.intro .block{
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.intro button{
+    background-color: #fff;
+    border: none;
+    padding: 20px;
+}
+
+.intro button:hover{
+    background-color: blue;
+    color: white;
+    transition: 0.1s;
+    transform: scale(1.1);
+    transition-timing-function: ease-in;
+}
+
+.description{
+    margin: 20px;
+}
+
+.description img{
+    margin: 10px;
+    height: 400px;
+    height: auto;
+}
+
+.project-details{
+    margin: 100px;
+}
+
+.project-cell:hover{
+    transform: scale(1.1);
+}
+
+.page{
+    justify-content: center;
+}
+
+
+.user-page{
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    padding: 20px 70px 20px 70px;
+    border-bottom: #000 1px solid;
+}
+
+.user-page img{
+    float: right;
+}
+
+.username{
+    color: #000;
+    font-weight: 400;
+}
+
+.name{
+    font-weight: 700;
+}
+
+.user-page .user-description{
+    font-weight: 300;
+}
+
+.user-page .user-link{
+    color: #67AFF1;
+    text-decoration: underline;
+}
+
+.user-page .user-link:visited{
+    color: deepskyblue;
+    text-decoration: underline;
+}
+
+.search-page{
+    padding: 100px 200px 100px 200px;
+}
+
+.user-cell{
+    background-color: #fff;
+    border: 1px #000 solid;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+#search-username{
+    border: none;
+    background: none;
+}
+
+.search-line{
+    background: #FFFFFF;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.project-cell{
+    width: 500px;
+    height: auto;
+    padding: 20px;
+    transition: 0.2s;
+}
+
+
+.project-info img{
+    width: 300px;
+    height: 200px;
+    margin: 15px 15px 15px 0;
+}
+
+.title{
+    font-weight: 700;
+}
+
+.project-description{
+    font-weight: 500;
+}
+
+.published{
+    color: gray;
+}
+
+
+
+
+
+.search{
+    margin-top: 200px;
+}
+
