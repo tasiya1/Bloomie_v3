@@ -20,6 +20,15 @@ let polySet = []
 
 sideBarWidth = 250
 
+function dgid(id){
+    return document.getElementById(id)
+}
+
+function dcel(tag, parent){
+    let el = document.createElement(tag)
+    parent.appendChild(el)
+    return el
+}
 
 function setRGB(r, g, b){
     return `rgb(${r},${g},${b})`
@@ -119,7 +128,7 @@ class DrawingTool {
     }
 
     setToolUI(title) {
-        let container = document.getElementById("tools-container")
+        let container = dgid("tools-container")
         let tool = document.createElement("div")
         tool.classList.add("tool")
         tool.id = title + "-button"
@@ -152,7 +161,7 @@ class DrawingTool {
         l.for = ws.id; l.innerText = ws.value
         ws.append(l)
         c.appendChild(ws)
-        document.getElementById("tools-properties").appendChild(c)
+        dgid("tools-properties").appendChild(c)
         */
     }
 }
@@ -163,7 +172,7 @@ class Pen extends DrawingTool {
         this.prevTime = 0
         this.title = "Pen"
 
-        document.getElementById(this.title + "-button").classList.add("selected-tool")
+        dgid(this.title + "-button").classList.add("selected-tool")
     }
 
     onDraw() {
@@ -403,9 +412,7 @@ class Waterbrush extends DrawingTool {
         this.dm.ct.closePath()
 
         let p = this.dm.generatePathPoints(1)
-        /*
-        if (p.length > this.recentness)
-            p = p.slice(-this.recentness)*/
+
         if (this.dm.distanceBetweenPoints() > this.density)
             if (this.leakingThreshold < Math.random()){
                 let leakagePoint = p[Math.floor(Math.random() * p.length)]
@@ -512,7 +519,7 @@ class ClipTool extends DrawingTool {
     }
 
     detailedUI(){
-        let b = document.getElementById(this.title + "-button").querySelector(".tool-additional")
+        let b = dgid(this.title + "-button").querySelector(".tool-additional")
         b.innerHTML += `<p id="reset-clip" style="    position: absolute;
         right: 0px;
         top: 50%;
@@ -520,20 +527,52 @@ class ClipTool extends DrawingTool {
         background-color: #555555;
         padding: 5px;
         z-index: 10;">Reset</p>`
-        document.getElementById("reset-clip").addEventListener("click", () => {
+        dgid("reset-clip").addEventListener("click", () => {
             this.dm.pr.clearRect(0, 0, this.dm.preview.width, this.dm.preview.height);
             this.dm.clearSelectionArea()
         })
     }
 }
 
+class Layer{
+    constructor(order, activeLayer){
+        this.order = order
+        
+        this.canvas = document.createElement("canvas")
+        this.canvas.id = order
+        if (activeLayer != null)
+            activeLayer.insertAdjacentElement("afterend", this.canvas)
+        else dgid("layers").insertBefore(this.canvas, dgid("preview"));
+        this.canvas.width = window.innerWidth - 400
+        this.canvas.height = window.innerHeight - 200
+
+        this.ct = this.canvas.getContext("2d", {willReadFrequently:true})
+    }
+}
+
 class DrawingMachine {
     constructor(){
+        this.baseId = Date.now()
+        let bg =  dcel("canvas", dgid("layers"))
+        bg.classList = "canvas-background"
+        bg.style.position = "absolute"
+        bg.style.zIndex = 5
 
-        this.canvas = document.getElementById("ground")
-        this.preview = document.getElementById("preview")
+        let w = window.innerWidth - 400
+        let h = window.innerHeight - 200
+        bg.width = w
+        bg.height = h
+
+        dgid('layers').innerHTML += `<canvas id="` + this.baseId +`" "></canvas>
+        <canvas id="preview"></canvas>`
+
+        this.canvas = dgid(this.baseId)
+        this.preview = dgid("preview")
 
         this.currentTool = null
+        this.currentLayerId = this.baseId
+        this.canvas.style.zIndex = 10
+        this.preview.style.zIndex = 120
         this.selectedButton = null
         this.drawingTools = []
         this.drawingMode = null
@@ -545,9 +584,7 @@ class DrawingMachine {
         this.colorChanging = true//false
         this.colorVectorInc = true
         this.is_drawing = false
-
-        let w = window.innerWidth - 200
-        let h = window.innerHeight - 200
+        this.sortable = null
 
         this.canvas.height = h
         this.canvas.width = w
@@ -563,7 +600,10 @@ class DrawingMachine {
         this.pr = this.preview.getContext("2d");
         this.ct.save()
 
+        this.layers = {layer1: {id:this.baseId, canvas: this.canvas, ct: this.ct}}
         this.pointArray = []
+
+        this.addLayerButton({order: this.baseId, zIndex: 10, canvas: this.canvas, ct: this.ct})
 
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
@@ -585,8 +625,8 @@ class DrawingMachine {
 
     initCanvas(){
         /*
-        let x = parseInt(document.getElementById("size-x").value);
-        let y = parseInt(document.getElementById("size-y").value);
+        let x = parseInt(dgid("size-x").value);
+        let y = parseInt(dgid("size-y").value);
 
         if (isNaN(x) || x == null || isNaN(y) || y == null){
             x = 1400;
@@ -603,7 +643,7 @@ class DrawingMachine {
         this.ct.fillStyle = "#f9f8f5";
         //this.ct.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-        document.getElementById("canvas-size-window").style.visibility = "hidden";
+        dgid("canvas-size-window").style.visibility = "hidden";
 
         window.addEventListener("mousedown", this.onMouseDown);
         window.addEventListener("mousemove", this.onMouseMove);
@@ -626,6 +666,7 @@ class DrawingMachine {
     clearSelectionArea(){
         this.ct.restore()
         this.ct.resetTransform()
+        this.ct.save()
     }
 
     refreshCanvasPosition(){
@@ -647,6 +688,7 @@ class DrawingMachine {
         if (ev.target.nodeName.toLowerCase() === 'canvas')
             this.is_drawing = true
         //updatePen()
+        this.ct.lineCap = "round"
         this.ct.globalAlpha = 1
         this.ct.strokeStyle = this.primarColor
         this.currentTool.updateTool()
@@ -692,6 +734,7 @@ class DrawingMachine {
         //this.ct.closePath()
         //this.pr.closePath()
         this.currentTool.onUp()
+        dgid("thumbnail-" + this.currentLayerId).src = this.canvas.toDataURL()
     }
 
     initDrawingTools(){
@@ -709,38 +752,55 @@ class DrawingMachine {
         }
 
         this.currentTool = this.drawingTools["Pen"]
-        this.selectedButton = document.getElementById("Pen-button")
+        this.selectedButton = dgid("Pen-button")
     }
 
     initToolButtons(){
         //clear button
-        document.getElementById("clear").addEventListener("click", ()=> {
+        dgid("clear").addEventListener("click", ()=> {
             this.ct.clearRect(0, 0, this.canvas.width, this.canvas.height)
         })
         //primary color button
-        document.getElementById("color-1").addEventListener("input", (event) => {this.primarColor = event.target.value})
+        dgid("color-1").addEventListener("input", (event) => {this.primarColor = event.target.value})
         //minor color button
-        document.getElementById("color-2").addEventListener("input", (event) => {this.minorColor = event.target.value})
+        dgid("color-2").addEventListener("input", (event) => {this.minorColor = event.target.value})
         //color palettes
-        document.getElementById("palette_button").addEventListener("click", () =>{document.getElementById("paletteBar").style.width = sideBarWidth + "px"; sbopen = true})
-        document.getElementById("closePalette").addEventListener("click", () => {document.getElementById("paletteBar").style.width = "0"; sbopen = false})
-
-        /* let palette = document.querySelectorAll(".palette")
-        palette = Array.from(palette)
-        palette.forEach(palette_color => {
-            palette_color.addEventListener("click", (event) => {
-                this.primarColor = palette_color.dataset.palette
-                document.getElementById("color-1").value = palette_color.dataset.palette
-            })    
-        }) */
+        dgid("palette_button").addEventListener("click", () =>{dgid("paletteBar").style.width = sideBarWidth + "px";})
+        dgid("closePalette").addEventListener("click", () => {dgid("paletteBar").style.width = "0";})
 
         //key reader
         document.body.addEventListener('keydown', (ev) => {this.manageKeys(ev)});
+
+
+        //layer management
+        dgid("add-layer").addEventListener("click", () => {this.addNewLayer()})
+        this.sortable = new Sortable(dgid("layer-list"), {/* handle: ".drag-button", */animation: 350, chosenClass: "layer-chosen", dragClass: "layer-drag",
+        swapThreshold: 1, direction: 'vertical', reversed: false, onUpdate: this.supportLayerOrder})
+
+        dgid("layers-icon").onclick = () => {
+            dgid("layer-bar").classList.contains("folded")?
+                dgid("layer-bar").classList.remove("folded")  :
+                dgid("layer-bar").classList.add("folded")}
+    }
+
+    supportLayerOrder(ev){
+        let updatedLayers = null
+        if (ev != null) updatedLayers =  Array.from(ev.from.children);
+        else updatedLayers = Array.from(dgid("layer-list").children)
+        //updatedLayers.shift()
+        //updatedLayers.pop()
+
+        for (let i = 0; i < updatedLayers.length; i++){
+            let l = updatedLayers[i]
+            dgid(l.dataset.id).style.zIndex = i + 10
+        }
+        console.log("Updated layers:", updatedLayers);
+    
     }
 
     initCustomPalette(){
-        document.getElementById("add_to_palette").addEventListener("click", ()=>{
-            document.getElementById("custom_palette").innerHTML+= "<div class=\"palette\" data-palette=\"" + this.primarColor + "\" style=\"background-color: " + this.primarColor + ";\"></div>"
+        dgid("add_to_palette").addEventListener("click", ()=>{
+            dgid("custom_palette").innerHTML+= "<div class=\"palette\" data-palette=\"" + this.primarColor + "\" style=\"background-color: " + this.primarColor + ";\"></div>"
             
             let paletteCustom = document.querySelectorAll(".palette")
             paletteCustom = Array.from(paletteCustom)
@@ -748,14 +808,14 @@ class DrawingMachine {
             paletteCustom.forEach(palette_color => {
             palette_color.addEventListener("click", () => {
                 this.primarColor = palette_color.dataset.palette
-                document.getElementById("color-1").value = palette_color.dataset.palette
+                dgid("color-1").value = palette_color.dataset.palette
             })    
         })
         })
     }
 
     initDownloader(){   
-        document.getElementById("save").addEventListener("click", () => {
+        dgid("save").addEventListener("click", () => {
             let canvas_image = document.createElement("a")
             canvas_image.href = this.canvas.toDataURL("imag/jpg")
             canvas_image.download = "My Blooming sketch"
@@ -771,9 +831,9 @@ class DrawingMachine {
         if (e.key == "s") {this.openSettingsBar()}
     }
 
-    openMenu(){document.getElementById("sideBar").style.width = sideBarWidth + "px"}
-    openPaletteBar(){document.getElementById("paletteBar").style.width = sideBarWidth + "px"}
-    openSettingsBar(){document.getElementById("settingsBar").style.width = sideBarWidth + "px"}
+    openMenu(){dgid("sideBar").style.width = sideBarWidth + "px"}
+    openPaletteBar(){dgid("paletteBar").style.width = sideBarWidth + "px"}
+    openSettingsBar(){dgid("settingsBar").style.width = sideBarWidth + "px"}
     closeSidebar(){document.querySelectorAll(".nav").forEach(element => {element.style.width = "0"})}
 
 
@@ -783,6 +843,117 @@ class DrawingMachine {
 
     setCurrentTool(title){
 
+    }
+
+    addNewLayer(){
+        let l = new Layer(Date.now().toString(), this.canvas)
+
+        l.canvas.width = this.canvas.width; l.canvas.height = this.canvas.height
+        this.ct = l.canvas.getContext("2d", { willReadFrequently: true })
+        
+        this.canvas = l.canvas
+        this.ct = this.canvas.getContext("2d")
+        this.addLayerButton(l)
+
+    }
+
+    addLayerButton(l){
+        let thumbnail = this.canvas.toDataURL();
+        let layerInfo = document.createElement("li")
+
+        let left = document.createElement("div"); left.classList = "left"
+        let right = document.createElement("div"); right.classList = "right"
+
+        let vmist = document.createElement("p")
+        if (dgid("layer-" + this.currentLayerId) != null)
+            dgid("layer-" + this.currentLayerId).classList.remove("selected")
+
+        layerInfo.classList = "layer-button"
+        vmist.contentEditable = true
+        vmist.innerText = "layer-" + l.order
+
+        let zIndex = parseInt(this.canvas.style.zIndex)
+
+        layerInfo.dataset.id = l.order
+        layerInfo.id = "layer-" + l.order
+        layerInfo.dataset.zIndex = l.zIndex
+        vmist.dataset.id = l.order
+        this.layers[l.order] = {id: l.order, zIndex: 0, canvas: l.canvas, ct: l.ct}
+        this.layers[l.order].canvas.style.zIndex = l.zIndex
+
+        this.canvas = this.layers[l.order].canvas
+        this.canvas.style.zIndex = l.zIndex
+        this.ct = this.layers[l.order].ct
+        let th = document.createElement("img")
+        th.classList = "layer-thumbnail"
+        th.src = thumbnail
+        th.id = "thumbnail-" + l.order
+
+        left.appendChild(th)
+        left.appendChild(vmist)
+        layerInfo.appendChild(left)
+        layerInfo.appendChild(right)
+
+        if (dgid("layer-" + this.currentLayerId) != null)
+            dgid("layer-" + this.currentLayerId).insertAdjacentElement("afterend", layerInfo)
+        else dgid("layer-list").appendChild(layerInfo)
+
+        let rembo = this.createButton(right, "delete", l.order, 20, 20)
+        rembo.addEventListener("click", (ev) => {
+            dgid(rembo.dataset.id).remove()
+            dgid("layer-" + rembo.dataset.id).remove()
+        })
+
+        this.currentLayerId = l.order
+        dgid("layer-" + this.currentLayerId).classList.add("selected")
+
+        this.supportLayerOrder(null)
+
+        layerInfo.onclick = () => {
+
+            if (dgid("layer-" + this.currentLayerId) != null)
+                dgid("layer-" + this.currentLayerId).classList.remove("selected")
+            
+            this.currentLayerId = layerInfo.dataset.id
+            this.ct = this.layers[layerInfo.dataset.id].ct
+            this.canvas = this.layers[layerInfo.dataset.id].canvas
+            dgid("layer-" + this.currentLayerId).classList.add("selected")
+
+        }
+    }
+
+    shiftLayers(){
+
+    }
+
+    createButton(parent, name, datasetId, w, h){
+        let b = document.createElement("div")
+        let img = document.createElement("img")
+        img.src = "icons/" + name + ".png"
+        img.width = w
+        img.h = h
+        b.appendChild(img)
+        b.id = name + "-button-" + datasetId
+        b.dataset.id = datasetId
+        parent.appendChild(b)
+        return b
+    }
+
+    renderImage(){
+        let image = null
+        let canvases = document.querySelectorAll("canvas")
+        canvases.sort((a, b) => {
+            const zIndexA = parseInt(a.style.zIndex);
+            const zIndexB = parseInt(b.style.zIndex);
+        
+            return zIndexA - zIndexB;
+        });
+        for (let c of canvases){
+
+        }
+        
+
+        return image
     }
 
     gaussianDistribution(mean, standardDeviation){
@@ -845,23 +1016,23 @@ class DrawingMachine {
 
 let dm = new DrawingMachine()
 
-document.getElementById("startCanvas").style.visibility = "hidden"//.addEventListener("click", () => { dm = new DrawingMachine(); });
+dgid("startCanvas").style.visibility = "hidden"//.addEventListener("click", () => { dm = new DrawingMachine(); });
 
 
 
-document.getElementById("close_button").addEventListener("click", () => { document.getElementById("sideBar").style.width = "0"; })
-document.getElementById("menu_button").addEventListener("click", () => { document.getElementById("sideBar").style.width = sideBarWidth + "px"; })
+dgid("close_button").addEventListener("click", () => { dgid("sideBar").style.width = "0"; })
+dgid("menu_button").addEventListener("click", () => { dgid("sideBar").style.width = sideBarWidth + "px"; })
 
-document.getElementById("settings_button").addEventListener("click", () => {document.getElementById("settingsBar").style.width = sideBarWidth + "px"; sbopen = true})
-document.getElementById("close_settings").addEventListener("click", () => {document.getElementById("settingsBar").style.width = "0"; sbopen = false})
+dgid("settings_button").addEventListener("click", () => {dgid("settingsBar").style.width = sideBarWidth + "px";})
+dgid("close_settings").addEventListener("click", () => {dgid("settingsBar").style.width = "0";})
 
 let canvasTemplate = "<div id=\"main\"><canvas id=\"" +  + "\"></canvas></div>"
 let layerListTemplate = "<div class=\"layer-preview\" id=\"" +  + "\"></div>"
 
 // SETTINGS HANDLING
 
-document.getElementById("showBrushes").addEventListener("click", ()=>{
-    if (document.getElementById("tools-section").classList.contains("folded"))
-        document.getElementById("tools-section").classList.remove("folded")
-    else document.getElementById("tools-section").classList.add("folded")
+dgid("showBrushes").addEventListener("click", ()=>{
+    if (dgid("tools-section").classList.contains("folded"))
+        dgid("tools-section").classList.remove("folded")
+    else dgid("tools-section").classList.add("folded")
 })

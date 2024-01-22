@@ -3,6 +3,8 @@
     <title>Edit Your Project</title>
     <link rel="stylesheet" type="text/css" href="styles/sketch.css">
     <link rel="shortcut icon" href="https://i.pinimg.com/originals/7c/43/0b/7c430ba6fb3cd7058aec52cb84a080e6.png" type="image/x-icon">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <script src="jquery-3.7.1.min.js"></script>
 </head>
 
 <body onselectstart="return false">
@@ -65,89 +67,44 @@
 
     <div id="gridBar" class="nav">
         <div class="settings_container">
-        <button id="closeGrid" class="close"><img src="icons/back.png" class="icon"></button>
-        <h3>Grid</h3>
-        <!--var x1=300, y1=100, w1=100, h1=100, ix=350, iy=250, ngridx = 3, ngridy = 3-->
-        <p>Start X</p>
-        <input type="range" class="slider" min="0" max="1000" value="0" id="sx_grid">
-        <label id="sxL" for="sx_grid">0</label>
+            <button id="closeGrid" class="close"><img src="icons/back.png" class="icon"></button>
+            <h3>Grid</h3>
+            <!--var x1=300, y1=100, w1=100, h1=100, ix=350, iy=250, ngridx = 3, ngridy = 3-->
+            <p>Start X</p>
+            <input type="range" class="slider" min="0" max="1000" value="0" id="sx_grid">
+            <label id="sxL" for="sx_grid">0</label>
 
-        <p>Start Y</p>
-        <input type="range" class="slider" min="0" max="1000" value="0" id="sy_grid">
-        <label id="syL" for="sy_grid">0</label>
+            <p>Start Y</p>
+            <input type="range" class="slider" min="0" max="1000" value="0" id="sy_grid">
+            <label id="syL" for="sy_grid">0</label>
 
-        <p>Width of cell</p>
-        <input type="range" class="slider" min="0" max="2000" value="0" id="w_grid">
-        <label id="wL" for="w_grid">0</label>
+            <p>Width of cell</p>
+            <input type="range" class="slider" min="0" max="2000" value="0" id="w_grid">
+            <label id="wL" for="w_grid">0</label>
 
-        <p>Height of cell</p>
-        <input type="range" class="slider" min="0" max="1000" value="0" id="h_grid">
-        <label id="hL" for="h_grid">0</label>
+            <p>Height of cell</p>
+            <input type="range" class="slider" min="0" max="1000" value="0" id="h_grid">
+            <label id="hL" for="h_grid">0</label>
 
-        <p>Offset X</p>
-        <input type="range" class="slider" min="0" max="700" value="0" id="offx_grid">
-        <label id="oxL" for="offx_grid">0</label>
+            <p>Offset X</p>
+            <input type="range" class="slider" min="0" max="700" value="0" id="offx_grid">
+            <label id="oxL" for="offx_grid">0</label>
 
-        <p>Offset Y</p>
-        <input type="range" class="slider" min="0" max="700" value="0" id="offy_grid">
-        <label id="oyL" for="offy_grid">0</label>
+            <p>Offset Y</p>
+            <input type="range" class="slider" min="0" max="700" value="0" id="offy_grid">
+            <label id="oyL" for="offy_grid">0</label>
 
-        <p>Amount of X grids</p>
-        <input type="range" class="slider" min="0" max="500" value="0" id="nx_grid">
-        <label id="nxL" for="nx_grid">0</label>
+            <p>Amount of X grids</p>
+            <input type="range" class="slider" min="0" max="500" value="0" id="nx_grid">
+            <label id="nxL" for="nx_grid">0</label>
 
-        <p>Amount of Y grids</p>
-        <input type="range" class="slider" min="0" max="500" value="0" id="ny_grid">
-        <label id="nyL" for="ny_grid">0</label>
+            <p>Amount of Y grids</p>
+            <input type="range" class="slider" min="0" max="500" value="0" id="ny_grid">
+            <label id="nyL" for="ny_grid">0</label>
 
-        <button id="goGrid" style="align-items: center;"><p style="color: black; font-weight: 200;">Draw grid</p></button>
+            <button id="goGrid" style="align-items: center;"><p style="color: black; font-weight: 200;">Draw grid</p></button>
+        </div>
     </div>
-    </div>
-
-
-    <div id="filterBar" class="nav">
-        <div class="settings_container">
-        <button id="closeFilters" class="close"><img src="icons/back.png" class="icon"></button>
-        <h3>Filters</h3>
-
-
-        <!--brightness, contrast, saturate, hue-rotate, blur, grayscale, sepia, invert, opacity-->
-
-        <p>Brightness</p>
-        <input type="range" class="slider" min="0" max="200" value="100" id="brightness">
-        <label id="brightness-label" for="brightness">100</label>
-
-        <p>Contrast</p>
-        <input type="range" class="slider" min="0" max="200" value="100" id="contrast">
-        <label id="contrast-label" for="contrast">100</label>
-
-        <p>Saturation</p>
-        <input type="range" class="slider" min="0" max="200" value="100" id="saturation">
-        <label id="saturation-label" for="saturation">100</label>
-
-        <p>Hue</p>
-        <input type="range" class="slider" min="0" max="360" value="0" id="hue">
-        <label id="hue-label" for="hue">0</label>
-
-        <p>Blur</p>
-        <input type="range" class="slider" min="0" max="20" value="0" id="blur">
-        <label id="blur-label" for="blur">0</label>
-
-        <p>Grayscale</p>
-        <input type="range" class="slider" min="0" max="100" value="0" id="grayscale">
-        <label id="grayscale-label" for="grayscale">0</label>
-
-        <p>Sepia</p>
-        <input type="range" class="slider" min="0" max="100" value="0" id="sepia">
-        <label id="sepia-label" for="sepia">0</label>
-
-        <p>Opacity</p>
-        <input type="range" class="slider" min="0" max="100" value="100" id="opacity">
-        <label id="opacity-label" for="opacity">100</label>
-
-    </div>
-    </div>
-
 
     <div class="nav" id="paletteBar">
         <button id="closePalette" class="close"><img src="icons/back.png" class="icon" height="20" width="20"></button>
@@ -171,13 +128,24 @@
 
     <div class="canvas-container" style="position: relative;">
         <div id="layers">
-                <canvas id="ground" style="background-image: url(https://img.freepik.com/premium-psd/transparent-background-checkered-wallpaper-photoshop-psd-4k-transparent-empty-grid-layout_691560-11.jpg?w=2000);
-                background-size: cover; background-attachment: fixed;"></canvas>
-                <canvas id="preview"></canvas>
+                
         </div>
     </div>
+
+
+    <div id="layer-bar" class="floating-bar folded">
+        <img src="icons/layers.png" alt="" class="icon" id="layers-icon">
+        <div class="tool" id="add-layer">
+            <img src="icons/plus.png" width="20" alt="">
+            <p>Add a layer</p>
+        </div>
+        <ol type="1" class="section" id="layer-list">
+
+        </ol>
+    </div>
+
 </div>
-    
+    <script type="text/javascript" src="script/layerhandlingUI.js"></script>
     <script type="text/javascript" src="script/main.js"></script>
     <script type="text/javascript" src="script/initColorPalettes.js"></script>
 </body>
