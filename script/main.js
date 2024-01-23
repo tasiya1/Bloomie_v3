@@ -770,17 +770,21 @@ class DrawingMachine {
 
         //key reader
         document.body.addEventListener('keydown', (ev) => {this.manageKeys(ev)});
-
+        dgid("showBrushes").addEventListener("click", ()=>{this.switchFoldingOfElement("tools-section")})
 
         //layer management
         dgid("add-layer").addEventListener("click", () => {this.addNewLayer()})
         this.sortable = new Sortable(dgid("layer-list"), {/* handle: ".drag-button", */animation: 350, chosenClass: "layer-chosen", dragClass: "layer-drag",
         swapThreshold: 1, direction: 'vertical', reversed: false, onUpdate: this.supportLayerOrder})
 
-        dgid("layers-icon").onclick = () => {
-            dgid("layer-bar").classList.contains("folded")?
-                dgid("layer-bar").classList.remove("folded")  :
-                dgid("layer-bar").classList.add("folded")}
+        dgid("layers-icon").onclick = () => {this.switchFoldingOfElement("layer-bar")}
+
+    }
+
+    switchFoldingOfElement(id){
+        dgid(id).classList.contains("folded")?
+            dgid(id).classList.remove("folded")  :
+            dgid(id).classList.add("folded")
     }
 
     supportLayerOrder(ev){
@@ -817,7 +821,7 @@ class DrawingMachine {
     initDownloader(){   
         dgid("save").addEventListener("click", () => {
             let canvas_image = document.createElement("a")
-            canvas_image.href = this.canvas.toDataURL("imag/jpg")
+            canvas_image.href = this.renderImage()//this.canvas.toDataURL("imag/jpg")
             canvas_image.download = "My Blooming sketch"
             canvas_image.click()
         })
@@ -829,6 +833,7 @@ class DrawingMachine {
         if (e.key == "m") {this.openMenu()}
         if (e.key == "p") {this.openPaletteBar()}
         if (e.key == "s") {this.openSettingsBar()}
+        if (e.key == "l") {this.switchFoldingOfElement("layer-bar")}
     }
 
     openMenu(){dgid("sideBar").style.width = sideBarWidth + "px"}
@@ -899,6 +904,7 @@ class DrawingMachine {
         else dgid("layer-list").appendChild(layerInfo)
 
         let rembo = this.createButton(right, "delete", l.order, 20, 20)
+        rembo.classList.add("delete-button")
         rembo.addEventListener("click", (ev) => {
             dgid(rembo.dataset.id).remove()
             dgid("layer-" + rembo.dataset.id).remove()
@@ -940,20 +946,23 @@ class DrawingMachine {
     }
 
     renderImage(){
-        let image = null
-        let canvases = document.querySelectorAll("canvas")
+        let sheet = document.createElement("canvas")
+        sheet.width = this.canvas.width; sheet.height = this.canvas.height
+        let sheetContext = sheet.getContext("2d")
+        sheetContext.clearRect(0, 0, sheet.width, sheet.height)
+        let canvases = Array.from(document.querySelectorAll("canvas"))
         canvases.sort((a, b) => {
-            const zIndexA = parseInt(a.style.zIndex);
-            const zIndexB = parseInt(b.style.zIndex);
-        
+            const zIndexA = parseInt(a.style.zIndex); const zIndexB = parseInt(b.style.zIndex);
             return zIndexA - zIndexB;
         });
-        for (let c of canvases){
-
+    
+        for (let c of canvases) {
+            //console.log(c.id + " " + c.style.zIndex)
+            sheetContext.drawImage(c, 0, 0)
         }
-        
-
-        return image
+        let image = sheet.toDataURL("image/png")
+        sheet.remove()
+        return image;
     }
 
     gaussianDistribution(mean, standardDeviation){
@@ -1018,21 +1027,8 @@ let dm = new DrawingMachine()
 
 dgid("startCanvas").style.visibility = "hidden"//.addEventListener("click", () => { dm = new DrawingMachine(); });
 
-
-
 dgid("close_button").addEventListener("click", () => { dgid("sideBar").style.width = "0"; })
 dgid("menu_button").addEventListener("click", () => { dgid("sideBar").style.width = sideBarWidth + "px"; })
 
 dgid("settings_button").addEventListener("click", () => {dgid("settingsBar").style.width = sideBarWidth + "px";})
 dgid("close_settings").addEventListener("click", () => {dgid("settingsBar").style.width = "0";})
-
-let canvasTemplate = "<div id=\"main\"><canvas id=\"" +  + "\"></canvas></div>"
-let layerListTemplate = "<div class=\"layer-preview\" id=\"" +  + "\"></div>"
-
-// SETTINGS HANDLING
-
-dgid("showBrushes").addEventListener("click", ()=>{
-    if (dgid("tools-section").classList.contains("folded"))
-        dgid("tools-section").classList.remove("folded")
-    else dgid("tools-section").classList.add("folded")
-})

@@ -45,7 +45,7 @@
         </div>
         <div class="section" id="tools-section">
             <!--Drawing tools as scrollable list-->
-            <div>
+            <div style="display: flex; justify-content: flex-start;">
                 <h3 style="display: inline-block">Tools</h3>
                 <div id="showBrushes" style="display: inline-block"><img src="icons/settings.png" height="30" width="30"></div>
             </div>
@@ -63,47 +63,6 @@
     <div class="nav" id="settingsBar">
         <button id="close_settings" class="close"><img src="icons/back.png" class="icon"></button>        
         
-    </div>
-
-    <div id="gridBar" class="nav">
-        <div class="settings_container">
-            <button id="closeGrid" class="close"><img src="icons/back.png" class="icon"></button>
-            <h3>Grid</h3>
-            <!--var x1=300, y1=100, w1=100, h1=100, ix=350, iy=250, ngridx = 3, ngridy = 3-->
-            <p>Start X</p>
-            <input type="range" class="slider" min="0" max="1000" value="0" id="sx_grid">
-            <label id="sxL" for="sx_grid">0</label>
-
-            <p>Start Y</p>
-            <input type="range" class="slider" min="0" max="1000" value="0" id="sy_grid">
-            <label id="syL" for="sy_grid">0</label>
-
-            <p>Width of cell</p>
-            <input type="range" class="slider" min="0" max="2000" value="0" id="w_grid">
-            <label id="wL" for="w_grid">0</label>
-
-            <p>Height of cell</p>
-            <input type="range" class="slider" min="0" max="1000" value="0" id="h_grid">
-            <label id="hL" for="h_grid">0</label>
-
-            <p>Offset X</p>
-            <input type="range" class="slider" min="0" max="700" value="0" id="offx_grid">
-            <label id="oxL" for="offx_grid">0</label>
-
-            <p>Offset Y</p>
-            <input type="range" class="slider" min="0" max="700" value="0" id="offy_grid">
-            <label id="oyL" for="offy_grid">0</label>
-
-            <p>Amount of X grids</p>
-            <input type="range" class="slider" min="0" max="500" value="0" id="nx_grid">
-            <label id="nxL" for="nx_grid">0</label>
-
-            <p>Amount of Y grids</p>
-            <input type="range" class="slider" min="0" max="500" value="0" id="ny_grid">
-            <label id="nyL" for="ny_grid">0</label>
-
-            <button id="goGrid" style="align-items: center;"><p style="color: black; font-weight: 200;">Draw grid</p></button>
-        </div>
     </div>
 
     <div class="nav" id="paletteBar">
@@ -139,9 +98,12 @@
             <img src="icons/plus.png" width="20" alt="">
             <p>Add a layer</p>
         </div>
-        <ol type="1" class="section" id="layer-list">
+        <div style="height: 90%; overflow-y: scroll; overflow-x: clip;">
+            <ol type="1" class="section" id="layer-list">
 
-        </ol>
+            </ol>
+        </div>
+
     </div>
 
 </div>
