@@ -25,11 +25,14 @@
     <div class="page">
     <div class="nav" id="sideBar" onselectstart="return false">
         <div class="section">
-            <button id="close_button" class="close" accesskey="esc"><img src="icons/close.png" class="icon"></button>
+            <button id="close_button" class="close-button" accesskey="esc"><img src="icons/close.png" class="icon"></button>
 
-            <input class="userColor" type="color" id="color-1" title="Pen color" value="#000000">
-            <input class="userColor" type="color" id="color-2" title="Fill color" value="#f9f8f5">
-            <button id="palette_button" class="userColor" title="Color palettes"><img src="icons/palette.png" class="icon"></button>
+            <div class="colors-section">
+                <input class="userColor" type="color" id="color-1" title="Pen color" value="#000000">
+                <input class="userColor" type="color" id="color-2" title="Fill color" value="#f9f8f5">
+                <button id="palette_button" class="userColor" title="Color palettes"><img src="icons/palette.png" class="icon"></button>
+            </div>
+
             <input type="range" class="slider" min="0" max="100" value="100" id="transparency_slider" title="Transparency of pen">
             <label for="transparency_slider" id="transparency_slider_label"></label>
         </div>
@@ -41,7 +44,8 @@
             <button id="save" title="Save as image"><img src="icons/save.png" class="icon"></button>
             <button id="clear" title="Clear the canvas"><img src="icons/clear.png" class="icon"></button>
             <!--<p><b>Settings</b></p>-->
-            <button id="settings_button" class="settings_button"><img src="icons/parameters.png" class="icon"></button>    
+            <button id="settings_button" class="settings_button" title="Settings"><img src="icons/parameters.png" class="icon"></button>
+            <button id="tips_button" class="settings_button" title="Tips"><img src="icons/tips.png" class="icon"></button>
         </div>
         <div class="section" id="tools-section">
             <!--Drawing tools as scrollable list-->
@@ -60,13 +64,28 @@
 
     </div>
 
-    <div class="nav" id="settingsBar">
-        <button id="close_settings" class="close"><img src="icons/back.png" class="icon"></button>        
+    <div class="nav closed" id="settingsBar">
+        <button id="close_settings" class="close-button"><img src="icons/back.png" class="icon"></button>        
         
     </div>
 
-    <div class="nav" id="paletteBar">
-        <button id="closePalette" class="close"><img src="icons/back.png" class="icon" height="20" width="20"></button>
+    <div class="nav closed" id="tips-bar">
+        <button id="close-tips-bar" class="close-button"><img src="icons/back.png" class="icon"></button>        
+        <h3>Shortcuts</h3>
+        <div class="shortcuts">
+            <p>Close Sidebar</p><div class="key"> <p>Esc</p></div>
+            <p>Open Menu</p><div class="key"> <p>M</p></div>
+            <p>Layers Bar</p><div class="key"><p>L</p></div>
+            <p>Palette</p><div class="key"><p>P</p></div>
+            <p>Settings</p><div class="key"><p>S</p></div>
+            <p>Tips</p><div class="key"><p>Q</p></div>
+            <p>Save as Image</p><div class="key"><p>Ctrl</p>+<p>S</p></div>
+        </div>
+
+    </div>
+
+    <div class="nav closed" id="paletteBar">
+        <button id="closePalette" class="close-button"><img src="icons/back.png" class="icon" height="20" width="20"></button>
 
         <div>
             <h3 style="display: inline-block;">Custom palette</h3>

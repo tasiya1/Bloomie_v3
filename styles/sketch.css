@@ -67,7 +67,7 @@ canvas {
   justify-content: space-between;
 }
 
-.selected {
+.selected, .selected:hover {
   background-color: #ff9e9eb5;
   background: radial-gradient(circle, ff9e9eb5 0%, ff9e9eb5 56%, ff9e9eb5 100%);
 }
@@ -96,9 +96,19 @@ h3{
   margin-left: 10px;
 }
 
+.close-button {
+  background-color: transparent;
+  float: right;
+  padding: 0;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  margin: 10px;
+}
+
 .nav{
   height: 100%;
-  width: 0px;
+  width: 250px;
   position: fixed;
   z-index: 999;
   top: 0;
@@ -110,6 +120,34 @@ h3{
   padding-top: 20px;
   padding-bottom: 20px;
   transition: 0.3s;
+}
+
+.shortcuts {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  padding: 5px;
+  align-items: center;
+  margin: 5px;
+  justify-items: center;
+}
+
+.shortcuts p {
+  margin: 0;
+}
+
+.key {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.key p {
+  border: 1px solid pink;
+  padding: 3px;
+  margin: 10px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 0px 3px pink;
 }
 
 .floating-bar {
@@ -240,10 +278,10 @@ h4{
   color: #f1f1f1;
 }
 
-
-.close {
-  background-color: rgba(0,0,0,0);
-  float: right;
+.colors-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
 }
 
 .userColor{
@@ -331,7 +369,7 @@ button:hover{
   transition: height 0.5s;
 }
 
-.selected-tool {
+.selected-tool, .selected-tool.tool:hover{
   background-color: #ff9e9eb5;
 }
 
@@ -370,6 +408,10 @@ button:hover{
 
 .folded #showBrushes{
   transform: rotate(180deg);
+}
+
+.closed.nav {
+  width: 0px;
 }
 
 .tool {

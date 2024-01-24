@@ -548,6 +548,7 @@ class Layer{
         this.canvas.height = window.innerHeight - 200
 
         this.ct = this.canvas.getContext("2d", {willReadFrequently:true})
+        this.ct.save();
     }
 }
 
@@ -758,35 +759,39 @@ class DrawingMachine {
     }
 
     initToolButtons(){
-        //clear button
-        dgid("clear").addEventListener("click", ()=> {
-            this.ct.clearRect(0, 0, this.canvas.width, this.canvas.height)
-        })
-        //primary color button
+        dgid("clear").addEventListener("click", ()=> { this.ct.clearRect(0, 0, this.canvas.width, this.canvas.height) })
         dgid("color-1").addEventListener("input", (event) => {this.primarColor = event.target.value})
-        //minor color button
         dgid("color-2").addEventListener("input", (event) => {this.minorColor = event.target.value})
-        //color palettes
-        dgid("palette_button").addEventListener("click", () =>{dgid("paletteBar").style.width = sideBarWidth + "px";})
-        dgid("closePalette").addEventListener("click", () => {dgid("paletteBar").style.width = "0";})
+        dgid("palette_button").addEventListener("click", () =>{this.switchFoldingOfElement("paletteBar", "nav")})
 
         //key reader
         document.body.addEventListener('keydown', (ev) => {this.manageKeys(ev)});
-        dgid("showBrushes").addEventListener("click", ()=>{this.switchFoldingOfElement("tools-section")})
+        dgid("showBrushes").addEventListener("click", ()=>{this.switchFoldingOfElement("tools-section", "section")})
 
         //layer management
         dgid("add-layer").addEventListener("click", () => {this.addNewLayer()})
         this.sortable = new Sortable(dgid("layer-list"), {/* handle: ".drag-button", */animation: 350, chosenClass: "layer-chosen", dragClass: "layer-drag",
         swapThreshold: 1, direction: 'vertical', reversed: false, onUpdate: this.supportLayerOrder})
 
-        dgid("layers-icon").onclick = () => {this.switchFoldingOfElement("layer-bar")}
+        dgid("layers-icon").onclick = () => {this.switchFoldingOfElement("layer-bar", "bar")}
+        dgid("tips_button").onclick = () => { this.switchFoldingOfElement("tips-bar", "nav") }
+        let partyClosers = Array.from(document.querySelectorAll(".close-button"))
+        partyClosers.forEach((button) => { button.onclick = () => {button.parentNode.classList.add("closed")} })
 
+        dgid("menu_button").addEventListener("click", () => { this.switchFoldingOfElement("sideBar", "nav")})
+        dgid("settings_button").addEventListener("click", () => {this.switchFoldingOfElement("settingsBar", "nav")})
     }
 
-    switchFoldingOfElement(id){
-        dgid(id).classList.contains("folded")?
-            dgid(id).classList.remove("folded")  :
-            dgid(id).classList.add("folded")
+    switchFoldingOfElement(id, foldingType){
+        let elClass = dgid(id).classList
+        switch (foldingType) {
+            case "nav":
+                elClass.contains("closed") ? elClass.remove("closed") : elClass.add("closed")
+                break;
+            default:
+                elClass.contains("folded") ? elClass.remove("folded") : elClass.add("folded")
+                break;
+        }
     }
 
     supportLayerOrder(ev){
@@ -821,27 +826,31 @@ class DrawingMachine {
     }
 
     initDownloader(){   
-        dgid("save").addEventListener("click", () => {
-            let canvas_image = document.createElement("a")
-            canvas_image.href = this.renderImage()//this.canvas.toDataURL("imag/jpg")
-            canvas_image.download = "My Blooming sketch"
-            canvas_image.click()
-        })
+        dgid("save").addEventListener("click", () => {this.downloadImage()})
     }
 
     manageKeys(e){
         if (e.key == "Escape") {this.closeSidebar()}
+        else if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            this.downloadImage()
+        }
+        else if (e.key == "m") {this.switchFoldingOfElement("sideBar", "nav")}
+        else if (e.key == "p") {this.switchFoldingOfElement("paletteBar", "nav")}
+        else if (e.key == "s") {this.switchFoldingOfElement("settingsBar", "nav")}
+        else if (e.key == "l") {this.switchFoldingOfElement("layer-bar", "bar")}
+        else if (e.key == "q") {this.switchFoldingOfElement("tips-bar", "nav")}
 
-        if (e.key == "m") {this.openMenu()}
-        if (e.key == "p") {this.openPaletteBar()}
-        if (e.key == "s") {this.openSettingsBar()}
-        if (e.key == "l") {this.switchFoldingOfElement("layer-bar")}
     }
 
-    openMenu(){dgid("sideBar").style.width = sideBarWidth + "px"}
-    openPaletteBar(){dgid("paletteBar").style.width = sideBarWidth + "px"}
-    openSettingsBar(){dgid("settingsBar").style.width = sideBarWidth + "px"}
-    closeSidebar(){document.querySelectorAll(".nav").forEach(element => {element.style.width = "0"})}
+    downloadImage(){
+        let canvas_image = document.createElement("a")
+        canvas_image.href = this.renderImage()//this.canvas.toDataURL("imag/jpg")
+        canvas_image.download = "My Blooming sketch"
+        canvas_image.click()
+    }
+
+    closeSidebar(){document.querySelectorAll(".nav").forEach(element => {element.classList.add("closed")})}
 
 
     getCurrentTool(){
@@ -1040,9 +1049,3 @@ class DrawingMachine {
 let dm = new DrawingMachine()
 
 dgid("startCanvas").style.visibility = "hidden"//.addEventListener("click", () => { dm = new DrawingMachine(); });
-
-dgid("close_button").addEventListener("click", () => { dgid("sideBar").style.width = "0"; })
-dgid("menu_button").addEventListener("click", () => { dgid("sideBar").style.width = sideBarWidth + "px"; })
-
-dgid("settings_button").addEventListener("click", () => {dgid("settingsBar").style.width = sideBarWidth + "px";})
-dgid("close_settings").addEventListener("click", () => {dgid("settingsBar").style.width = "0";})
