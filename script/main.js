@@ -540,6 +540,7 @@ class Layer{
         
         this.canvas = document.createElement("canvas")
         this.canvas.id = order
+        this.canvas.style.opacity = "1"
         if (activeLayer != null)
             activeLayer.insertAdjacentElement("afterend", this.canvas)
         else dgid("layers").insertBefore(this.canvas, dgid("preview"));
@@ -588,6 +589,7 @@ class DrawingMachine {
 
         this.canvas.height = h
         this.canvas.width = w
+        this.canvas.style.opacity = "1"
 
         this.preview.height = h
         this.preview.width = w
@@ -852,7 +854,7 @@ class DrawingMachine {
 
     addNewLayer(){
         let l = new Layer(Date.now().toString(), this.canvas)
-
+        //l.canvas.style.opacity = "1"
         l.canvas.width = this.canvas.width; l.canvas.height = this.canvas.height
         this.ct = l.canvas.getContext("2d", { willReadFrequently: true })
         
@@ -869,13 +871,13 @@ class DrawingMachine {
         let left = document.createElement("div"); left.classList = "left"
         let right = document.createElement("div"); right.classList = "right"
 
-        let vmist = document.createElement("p")
+        let vmist = document.createElement("textarea")
+        vmist.classList = "layer-title"
         if (dgid("layer-" + this.currentLayerId) != null)
             dgid("layer-" + this.currentLayerId).classList.remove("selected")
 
         layerInfo.classList = "layer-button"
-        vmist.contentEditable = true
-        vmist.innerText = "layer-" + l.order
+        vmist.value = "layer-" + l.order
 
         let zIndex = parseInt(this.canvas.style.zIndex)
 
@@ -908,6 +910,17 @@ class DrawingMachine {
         rembo.addEventListener("click", (ev) => {
             dgid(rembo.dataset.id).remove()
             dgid("layer-" + rembo.dataset.id).remove()
+        })
+
+        let visi = this.createButton(right, "visibility", l.order, 20, 20)
+        visi.addEventListener("click", () => {
+            if (parseInt(dgid(visi.dataset.id).style.opacity) == 1){
+                dgid(visi.dataset.id).style.opacity = "0"
+                visi.querySelector("img").src = "icons/" + "unvisibility" + ".png"
+            } else {
+                dgid(visi.dataset.id).style.opacity = "1"
+                visi.querySelector("img").src = "icons/" + "visibility" + ".png"
+            }
         })
 
         this.currentLayerId = l.order
@@ -958,7 +971,8 @@ class DrawingMachine {
     
         for (let c of canvases) {
             //console.log(c.id + " " + c.style.zIndex)
-            sheetContext.drawImage(c, 0, 0)
+            if (parseInt(c.style.opacity) == 1)
+                sheetContext.drawImage(c, 0, 0)
         }
         let image = sheet.toDataURL("image/png")
         sheet.remove()
