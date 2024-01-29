@@ -4,7 +4,9 @@
     <link rel="stylesheet" type="text/css" href="styles/sketch.css">
     <link rel="shortcut icon" href="https://i.pinimg.com/originals/7c/43/0b/7c430ba6fb3cd7058aec52cb84a080e6.png" type="image/x-icon">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
-    <script src="jquery-3.7.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
 </head>
 
 <body onselectstart="return false">
@@ -28,8 +30,8 @@
             <button id="close_button" class="close-button" accesskey="esc"><img src="icons/close.png" class="icon"></button>
 
             <div class="colors-section">
-                <input class="userColor" type="color" id="color-1" title="Pen color" value="#000000">
-                <input class="userColor" type="color" id="color-2" title="Fill color" value="#f9f8f5">
+                <!--<input id="color_input" style="visibility: hidden;" data-coloris>-->
+                <input class="userColor" type="color" id="color-input" title="Pen color" value="#000000">
                 <button id="palette_button" class="userColor" title="Color palettes"><img src="icons/palette.png" class="icon"></button>
             </div>
 
@@ -57,7 +59,7 @@
 
             </div>
         </div>   
-
+        <h3>Tool Properties</h3>
         <div class="section" id="tools-properties">
 
         </div>

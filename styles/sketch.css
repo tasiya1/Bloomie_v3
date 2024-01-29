@@ -219,7 +219,11 @@ h3{
 }
 
 #tools-properties {
-
+  max-height: 250px;
+  padding: 5px;
+  overflow-x: hidden;
+  background-color: rgba(75, 75, 75, 0.598);
+  margin: 5px;
 }
 
 .settings{
@@ -363,13 +367,13 @@ button:hover{
 .tool-properties-container.selected-tool-property {
   display: flex;
   flex-direction: column;
+  margin: 5px 10px 20px 10px;
 }
 
 .tool-properties-container {
-  margin: 40px 10px;
   display: none;
   /* grid-template-columns: 1fr 1fr; */
-  border-bottom: 1px solid grey;
+
 }
 
 .slider-field {
@@ -386,6 +390,8 @@ button:hover{
   flex-wrap: nowrap;
   flex-direction: column;
   transition: height 0.5s;
+  height: 250px;
+  overflow-x: hidden;
 }
 
 .selected-tool, .selected-tool.tool:hover{
@@ -482,6 +488,10 @@ p:hover{
 
 .tool:last-of-type{
   border: none;
+}
+
+.colors-section {
+  position: relative;
 }
 
 #paletteBar button{
@@ -590,4 +600,12 @@ p:hover{
 
 ::-webkit-scrollbar-corner {
   display: none;
+}
+
+@media only screen and (max-width: 768px) {
+
+.nav {
+  width: 100%;
+}
+
 }

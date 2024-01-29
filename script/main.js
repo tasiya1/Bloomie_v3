@@ -113,6 +113,8 @@ class DrawingMachine {
         this.transi = 50
         this.primarColor = "#000000"
         this.minorColor = "#ffffff"
+        this.smooth = true
+        this.smoothFactor = 0.2
 
         this.colorChanging = true//false
         this.colorVectorInc = true
@@ -132,7 +134,7 @@ class DrawingMachine {
 
         this.ct = this.canvas.getContext("2d", { willReadFrequently: true });
         this.pr = this.preview.getContext("2d");
-        this.ct.save()
+        this.pr.save()
 
         this.layers = {layer1: {id:this.baseId, canvas: this.canvas, ct: this.ct}}
         this.pointArray = []
@@ -174,8 +176,8 @@ class DrawingMachine {
 
         this.pr = this.preview.getContext("2d");
         this.ct = this.canvas.getContext("2d", { willReadFrequently: true });
-        this.ct.fillStyle = "#f9f8f5";
-        //this.ct.fillRect(0, 0, window.innerWidth, window.innerHeight);
+        this.pr.fillStyle = "#f9f8f5";
+        //this.pr.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
         dgid("canvas-size-window").style.visibility = "hidden";
 
@@ -187,20 +189,20 @@ class DrawingMachine {
         window.addEventListener("touchmove", this.onTouchMove, { passive: false });
         window.addEventListener("touchend", this.onTouchEnd);
 
-        this.ct.lineWidth = 1;
-        this.ct.lineCap = "round";
-        this.ct.lineJoin = "miter";
-        this.ct.strokeStyle = color1;
-        this.ct.fillStyle = color2;
+        this.pr.lineWidth = 1;
+        this.pr.lineCap = "round";
+        this.pr.lineJoin = "miter";
+        this.pr.strokeStyle = color1;
+        this.pr.fillStyle = color2;
         this.pr.lineJoin = "miter";
 
         window.addEventListener('resize', () => {this.refreshCanvasPosition()});
     }
 
     clearSelectionArea(){
-        this.ct.restore()
-        this.ct.resetTransform()
-        this.ct.save()
+        this.pr.restore()
+        this.pr.resetTransform()
+        this.pr.save()
     }
 
     refreshCanvasPosition(){
@@ -218,16 +220,16 @@ class DrawingMachine {
     onMouseUp(ev){ this.toolUp(ev) }
 
     toolDown(ev){
-
+        this.pointArray = []
         if (ev.target.nodeName.toLowerCase() === 'canvas')
             this.is_drawing = true
         //updatePen()
-        this.ct.lineCap = "round"
-        this.ct.globalAlpha = 1
-        this.ct.strokeStyle = this.primarColor
+        this.pr.lineCap = "round"
+        this.pr.globalAlpha = 1
+        this.pr.strokeStyle = this.primarColor
         this.currentTool.updateTool()
         this.currentTool.setStartingHue()
-        this.ct.beginPath() // to prevent changing the properties of finished objects
+        this.pr.beginPath() // to prevent changing the properties of finished objects
         this.pr.beginPath()
 
         this.pointArray.splice(0, this.pointArray.length)
@@ -238,13 +240,16 @@ class DrawingMachine {
 
     toolOn(ev){
 
-        if (this.is_drawing && ev.target.nodeName.toLowerCase() != 'canvas')
+        if (this.is_drawing && ev.target.nodeName.toLowerCase() != 'canvas'){
             this.closeSidebar()
+            this.closeLayerBar()
+        }
+
 
         this.curX = ev.clientX - this.marginX
         this.curY = ev.clientY - this.marginY
     
-        this.pointArray.push([this.curX, this.curY])
+        this.pointArray.push({x: this.curX, y: this.curY})
 
         if (this.prevX == null || this.prevY == null){
             this.prevX = ev.clientX
@@ -262,13 +267,32 @@ class DrawingMachine {
     }
 
     toolUp(ev){
+        this.pointArray.push({x: this.curX, y: this.curY})
+
+        this.previewCanvasToMainCanvas()
+        //this.clearPreviewCanvas()
+
         this.is_drawing = false
         this.endX = ev.clientX
         this.endY = ev.clientY
-        //this.ct.closePath()
+        //this.pr.closePath()
         //this.pr.closePath()
         this.currentTool.onUp()
+        this.replayStroke()
         dgid("thumbnail-" + this.canvas.id).src = this.canvas.toDataURL()
+    }
+
+    clearPreviewCanvas(){
+        this.pr.clearRect(0, 0, this.canvas.width, this.canvas.height)
+    }
+
+    previewCanvasToMainCanvas(){
+        let img = new Image()
+        img.onload = () => {
+            this.ct.drawImage(img, 0, 0)
+            this.clearPreviewCanvas()
+        }
+        img.src = this.preview.toDataURL("image/png")
     }
 
     initDrawingTools(){
@@ -295,10 +319,27 @@ class DrawingMachine {
         this.selectedButton = dgid("Pen-button")
     }
 
+    setColor(color){
+        this.primarColor = color
+    }
+
     initToolButtons(){
         dgid("clear").addEventListener("click", ()=> { this.ct.clearRect(0, 0, this.canvas.width, this.canvas.height) })
-        dgid("color-1").addEventListener("input", (event) => {this.primarColor = event.target.value})
-        dgid("color-2").addEventListener("input", (event) => {this.minorColor = event.target.value})
+
+        dgid("color-input").addEventListener("input", (event) => {this.primarColor = event.target.value})
+        /*dgid("color-2").addEventListener("input", (event) => {this.minorColor = event.target.value})*/
+/*
+        Coloris({
+            el: '#color-input',
+            themeMode: 'light',
+            alpha: true,
+            format: 'hex',
+            formatToggle: true,
+            defaultColor: '#000000',
+            onChange: (color) => {this.setColor(color)}
+        });
+        document.onload = () => {document.querySelector("clr-field").addEventListener("click", () => {dgid("color-input").click()})}
+*/
         dgid("palette_button").addEventListener("click", () =>{this.switchFoldingOfElement("paletteBar", "nav")})
 
         //key reader
@@ -367,7 +408,7 @@ class DrawingMachine {
     }
 
     manageKeys(e){
-        if (e.key == "Escape") {this.closeSidebar()}
+        if (e.key == "Escape") {this.closeSidebar(); this.closeLayerBar()}
         else if (e.ctrlKey && e.key === 's') {
             e.preventDefault();
             this.downloadImage()
@@ -388,7 +429,7 @@ class DrawingMachine {
     }
 
     closeSidebar(){document.querySelectorAll(".nav").forEach(element => {element.classList.add("closed")})}
-
+    closeLayerBar(){dgid("layer-bar").classList.add("folded")}
 
     getCurrentTool(){
         //this.drawingMode
@@ -549,6 +590,46 @@ class DrawingMachine {
         let image = sheet.toDataURL("image/png")
         sheet.remove()
         return image;
+    }
+
+    replayStroke(){
+        let points = this.smoothPath()
+        //this.pr.clearRect(0, 0, this.canvas.width, this.canvas.height)
+        this.prevX = points[0].x; this.prevY = points[0].y;
+        //this.pr.moveTo(points[0].x, points[0].y)
+        //this.pr.strokeStyle = "#ff0000"
+        for (let p of points) {
+            this.curX = p.x; this.curY = p.y;
+            this.currentTool.onDraw()
+            //this.pr.moveTo(p.x, p.y)
+            this.prevX = p.x; this.prevY = p.y;
+        }
+    }
+
+    smoothPath(){
+        let points = this.pointArray;
+        if (points.length < 3) {
+            return points
+        }
+
+        let smoothedPoints = [{x: this.pointArray[0].x, y: this.pointArray[0].y}]
+
+        for (let i = 1; i < points.length - 1; i++) {
+            let xc = (points[i].x + points[i + 1].x) / 2
+            let yc = (points[i].y + points[i + 1].y) / 2
+
+            let xcp = (points[i - 1].x + points[i].x) / 2
+            let ycp = (points[i - 1].y + points[i].y) / 2
+
+            smoothedPoints.push({
+                x: xcp + (xc - xcp) * this.smoothFactor,
+                y: ycp + (yc - ycp) * this.smoothFactor
+            })
+            smoothedPoints.push({ x: xc, y: yc })
+        }
+        smoothedPoints.push(points[points.length - 1])
+
+        return smoothedPoints
     }
 
     gaussianDistribution(mean, standardDeviation){

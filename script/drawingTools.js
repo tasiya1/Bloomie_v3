@@ -20,9 +20,9 @@ class DrawingTool {
     }
 
     updateTool(){
-        this.dm.ct.globalAlpha = 1
-        this.dm.ct.strokeStyle = this.color = this.dm.primarColor
-        this.dm.ct.lineWidth = this.width
+        this.dm.pr.globalAlpha = 1
+        this.dm.pr.strokeStyle = this.color = this.dm.primarColor
+        this.dm.pr.lineWidth = this.width
     }
 
     dynamicDraw(){
@@ -83,7 +83,14 @@ class DrawingTool {
                 let innerContainer = dcel("div", container)
                 innerContainer.classList = "slider-field"
                 let slider = document.createElement('input')
-                slider.type = 'range'; slider.min = 1; slider.max = 100; slider.step = 1
+                slider.type = 'range'; 
+                
+                if (Number.isInteger(value)) {
+                    slider.min = 1; slider.max = 100; slider.step = 1
+                } else {
+                    slider.min = 0.05; slider.max = 1; slider.step = 0.05
+                }
+
                 slider.style.width = "50%"
                 slider.value = value
     
@@ -115,10 +122,10 @@ class Pen extends DrawingTool {
     }
 
     onDraw() {
-        this.dm.ct.beginPath();   
-        this.dm.ct.moveTo(this.dm.prevX, this.dm.prevY)
-        this.dm.ct.lineTo(this.dm.curX, this.dm.curY)
-        this.dm.ct.stroke(); 
+        this.dm.pr.beginPath();   
+        this.dm.pr.moveTo(this.dm.prevX, this.dm.prevY)
+        this.dm.pr.lineTo(this.dm.curX, this.dm.curY)
+        this.dm.pr.stroke(); 
     }
 
 }
@@ -126,30 +133,30 @@ class Pen extends DrawingTool {
 class Scatter extends DrawingTool {
     constructor(dm, title) {
         super(dm, title);
+        this.width = 70
         this.dotSize = 2
         this.density = 10
-        this.splashDiameter = 70
         this.mean = 10
         this.isFlat = true
     }
 
     updateTool(){
-        this.dm.ct.lineWidth = this.dotSize
-        this.dm.ct.strokeStyle = this.color = this.dm.primarColor
+        this.dm.pr.lineWidth = this.dotSize
+        this.dm.pr.strokeStyle = this.color = this.dm.primarColor
     }
 
     onDraw() {
         var p = []
         for (let i = 0; i < this.density; i++) {
             if (this.isFlat)
-                p = this.dm.pointsWithinCircle(this.splashDiameter, this.dm.curX, this.dm.curY, this.isFlat)
-            else p = this.dm.gaussianDistribution(this.mean, this.splashDiameter)
+                p = this.dm.pointsWithinCircle(this.width, this.dm.curX, this.dm.curY, this.isFlat)
+            else p = this.dm.gaussianDistribution(this.mean, this.width)
             //p.x = this.dm.curX - (Math.random()>0.5?p.x:-p.x)
             //p.y = this.dm.curY - (Math.random()>0.5?p.y:-p.y)
-            this.dm.ct.beginPath()
-            this.dm.ct.moveTo(p.x, p.y)
-            this.dm.ct.lineTo(p.x, p.y)
-            this.dm.ct.stroke()
+            this.dm.pr.beginPath()
+            this.dm.pr.moveTo(p.x, p.y)
+            this.dm.pr.lineTo(p.x, p.y)
+            this.dm.pr.stroke()
         }
     }
 }
@@ -162,12 +169,12 @@ class Eraser extends DrawingTool {
     onDraw() {
         let pathPoints = this.dm.generatePathPoints(5)
         for (let p of pathPoints){
-            //this.dm.ct.clearRect(p.x-this.width, p.y-this.width, 2*this.width, 2*this.width)
+            //this.dm.pr.clearRect(p.x-this.width, p.y-this.width, 2*this.width, 2*this.width)
             this.dm.ct.globalCompositeOperation = "destination-out"
             this.dm.ct.beginPath()
             this.dm.ct.arc(p.x, p.y, this.width, 0, 2 * Math.PI)
             this.dm.ct.fill()
-            //this.dm.ct.fillStyle = "rgba(255, 255, 255, 0.1)"
+            //this.dm.pr.fillStyle = "rgba(255, 255, 255, 0.1)"
         }
 
         this.dm.ct.globalCompositeOperation = "source-over"
@@ -193,25 +200,25 @@ class Bridge extends DrawingTool {
             i = this.dm.pointArray.length - this.point_recentness - 1
         else i = 0
         for (; i < this.dm.pointArray.length; i++){
-            this.dm.ct.strokeStyle = setHexRGBA(this.color, this.lineOpacity)
-            this.dm.ct.beginPath()
-            this.dm.ct.moveTo(this.dm.prevX, this.dm.prevY)
-            this.dm.ct.lineTo(this.dm.curX, this.dm.curY)
-            this.dm.ct.stroke()
-            this.dm.ct.closePath()
+            this.dm.pr.strokeStyle = setHexRGBA(this.color, this.lineOpacity)
+            this.dm.pr.beginPath()
+            this.dm.pr.moveTo(this.dm.prevX, this.dm.prevY)
+            this.dm.pr.lineTo(this.dm.curX, this.dm.curY)
+            this.dm.pr.stroke()
+            this.dm.pr.closePath()
     
             let dx = this.dm.pointArray[i][0]-this.dm.curX
             let dy = this.dm.pointArray[i][1]-this.dm.curY
             let d = dx * dx + dy * dy;
             if ((d < this.connectivity_range*this.connectivity_range) && (i % this.bridge_density == 0)){
-                this.dm.ct.strokeStyle = setHexRGBA(this.color, this.bridgesOpacity)
+                this.dm.pr.strokeStyle = setHexRGBA(this.color, this.bridgesOpacity)
                 let odx = dx*(this.line_offset/10)
                 let ody = dy*(this.line_offset/10)
-                this.dm.ct.beginPath()
-                this.dm.ct.moveTo((this.dm.curX > this.dm.pointArray[i][0])?(this.dm.curX+odx):(this.dm.curX-odx), (this.dm.curY > this.dm.pointArray[i][1])?(this.dm.curY+ody):(this.dm.curY-ody))
-                this.dm.ct.lineTo((this.dm.curX > this.dm.pointArray[i][0])?(this.dm.pointArray[i][0]-odx):(this.dm.pointArray[i][0]+ody), (this.dm.curY > this.dm.pointArray[i][1])?(this.dm.pointArray[i][1]-ody):(this.dm.pointArray[i][1]+ody))
-                this.dm.ct.stroke();
-                this.dm.ct.closePath()
+                this.dm.pr.beginPath()
+                this.dm.pr.moveTo((this.dm.curX > this.dm.pointArray[i][0])?(this.dm.curX+odx):(this.dm.curX-odx), (this.dm.curY > this.dm.pointArray[i][1])?(this.dm.curY+ody):(this.dm.curY-ody))
+                this.dm.pr.lineTo((this.dm.curX > this.dm.pointArray[i][0])?(this.dm.pointArray[i][0]-odx):(this.dm.pointArray[i][0]+ody), (this.dm.curY > this.dm.pointArray[i][1])?(this.dm.pointArray[i][1]-ody):(this.dm.pointArray[i][1]+ody))
+                this.dm.pr.stroke();
+                this.dm.pr.closePath()
             }
         } 
     }
@@ -234,12 +241,12 @@ class Airbrush extends DrawingTool {
             x = this.dm.prevX + Math.sin(angle)*i
             y = this.dm.prevY + Math.cos(angle)*i
     
-            let brush_airbrush = dm.ct.createRadialGradient(x, y, 1, x, y, this.width)
+            let brush_airbrush = dm.pr.createRadialGradient(x, y, 1, x, y, this.width)
             brush_airbrush.addColorStop(0, setHexRGBA(this.color, 0.125))
             brush_airbrush.addColorStop(0.5, setHexRGBA(this.color, 0.0625))
             brush_airbrush.addColorStop(1, setHexRGBA(this.color, 0))
-            this.dm.ct.fillStyle = brush_airbrush
-            this.dm.ct.fillRect(x-this.width, y-this.width, 2*this.width, 2*this.width)
+            this.dm.pr.fillStyle = brush_airbrush
+            this.dm.pr.fillRect(x-this.width, y-this.width, 2*this.width, 2*this.width)
         }
     }
 
@@ -255,42 +262,42 @@ class Airbrush extends DrawingTool {
 
     updateTool(){
         this.color = this.dm.primarColor
-        this.dm.ct.strokeStyle = "rgba(0,0,0,0)"
-        this.dm.ct.lineWidth = this.width
+        this.dm.pr.strokeStyle = "rgba(0,0,0,0)"
+        this.dm.pr.lineWidth = this.width
     }
 }
 
 class Drops extends DrawingTool {
     constructor(dm, title) {
         super(dm, title);
-        this.size = 10
+        this.width = 40
+        this.dotSize = 10
         this.transparency = 0.5
         this.opacity_jitter = 0.5
-        this.jitter_range = 30
         this.density = 3
 
-        //this.dm.ct.fillStyle = setRGB(0,0,0)//"black"
+        //this.dm.pr.fillStyle = setRGB(0,0,0)//"black"
     }
 
     onDraw() {
         let opacity = this.opacity_jitter * Math.random()
         for (let i = 0; i < this.density; i++){
             opacity = 1 - this.opacity_jitter + this.opacity_jitter * Math.random() 
-            this.dm.ct.fillStyle = setHexRGBA(this.color, opacity)//setRGBA(rgb[0], rgb[1], rgb[2], opacity)
-            this.dm.ct.beginPath()
-            let eh1 = Math.random()*this.jitter_range*(Math.random()<0.5?(-1):1)
-            let eh2 = Math.random()*this.jitter_range*(Math.random()<0.5?(-1):1)
-            this.dm.ct.arc(this.dm.prevX+eh1,this.dm.prevY+eh2, Math.random()*this.size, 0, 2*Math.PI, true)
-            this.dm.ct.fill()
-            this.dm.ct.stroke()
-            this.dm.ct.closePath()
+            this.dm.pr.fillStyle = setHexRGBA(this.color, opacity)//setRGBA(rgb[0], rgb[1], rgb[2], opacity)
+            this.dm.pr.beginPath()
+            let eh1 = Math.random()*this.width*(Math.random()<0.5?(-1):1)
+            let eh2 = Math.random()*this.width*(Math.random()<0.5?(-1):1)
+            this.dm.pr.arc(this.dm.prevX+eh1,this.dm.prevY+eh2, Math.random()*this.dotSize, 0, 2*Math.PI, true)
+            this.dm.pr.fill()
+            this.dm.pr.stroke()
+            this.dm.pr.closePath()
         }  
     }
 
     updateTool(){
-        this.dm.ct.strokeStyle = "rgba(0,0,0,0)"
+        this.dm.pr.strokeStyle = "rgba(0,0,0,0)"
         this.color = this.dm.primarColor
-        this.dm.ct.fillStyle = setHexRGBA(this.color, this.transparency)
+        this.dm.pr.fillStyle = setHexRGBA(this.color, this.transparency)
     }
 }
 
@@ -303,40 +310,40 @@ class Strokes extends DrawingTool {
     }
 
     onDraw() {
-        this.dm.ct.strokeStyle = this.color
+        this.dm.pr.strokeStyle = this.color
         var inc_dist = 0
         let transparency = 1
         for (let i = 1; i <= this.nlines; i++){
-            this.dm.ct.beginPath()
-            this.dm.ct.moveTo(this.dm.prevX, this.dm.prevY+inc_dist);
-            this.dm.ct.lineTo(this.dm.curX, this.dm.curY+inc_dist);
-            this.dm.ct.stroke();
+            this.dm.pr.beginPath()
+            this.dm.pr.moveTo(this.dm.prevX, this.dm.prevY+inc_dist);
+            this.dm.pr.lineTo(this.dm.curX, this.dm.curY+inc_dist);
+            this.dm.pr.stroke();
             inc_dist = this.linedistance*i
-            this.dm.ct.strokeStyle = setHexRGBA(this.color, transparency)
+            this.dm.pr.strokeStyle = setHexRGBA(this.color, transparency)
             transparency -= 1/this.nlines
         }
     }
     
     updateTool(){
-        this.dm.ct.strokeStyle = this.color = this.dm.primarColor
-        this.dm.ct.lineWidth = this.width
+        this.dm.pr.strokeStyle = this.color = this.dm.primarColor
+        this.dm.pr.lineWidth = this.width
     }
 }
 
 class Pixels extends DrawingTool {
     constructor(dm, title) {
         super(dm, title);
-        this.size = 5
+        this.width = 5
     }
 
     onDraw() {
-        this.dm.ct.beginPath()
-        this.dm.ct.fillRect(Math.floor(this.dm.curX/this.size)*this.size, Math.floor(this.dm.curY/this.size)*this.size, this.size, this.size)
-        this.dm.ct.stroke()
+        this.dm.pr.beginPath()
+        this.dm.pr.fillRect(Math.floor(this.dm.curX/this.width)*this.width, Math.floor(this.dm.curY/this.width)*this.width, this.width, this.width)
+        this.dm.pr.stroke()
     }
 
     updateTool(){
-        this.dm.ct.fillStyle = this.dm.primarColor
+        this.dm.pr.fillStyle = this.dm.primarColor
     }
 }
 
@@ -352,11 +359,11 @@ class Waterbrush extends DrawingTool {
     }
 
     onDraw(){
-        this.dm.ct.beginPath();   
-        this.dm.ct.moveTo(this.dm.prevX, this.dm.prevY)
-        this.dm.ct.lineTo(this.dm.curX, this.dm.curY)
-        this.dm.ct.stroke();
-        this.dm.ct.closePath()
+        this.dm.pr.beginPath();   
+        this.dm.pr.moveTo(this.dm.prevX, this.dm.prevY)
+        this.dm.pr.lineTo(this.dm.curX, this.dm.curY)
+        this.dm.pr.stroke();
+        this.dm.pr.closePath()
 
         let p = this.dm.generatePathPoints(1)
 
@@ -370,8 +377,8 @@ class Waterbrush extends DrawingTool {
     }
 
     updateTool(){
-        this.dm.ct.lineWidth = this.width
-        this.dm.ct.strokeStyle = this.color = this.dm.primarColor
+        this.dm.pr.lineWidth = this.width
+        this.dm.pr.strokeStyle = this.color = this.dm.primarColor
     }
 }
 
@@ -406,18 +413,18 @@ class Leak {
     }
 
     run(){
-        dm.ct.strokeStyle = this.color
-        dm.ct.beginPath()
+        dm.pr.strokeStyle = this.color
+        dm.pr.beginPath()
         this.width *= Math.exp(-0.1)
-        dm.ct.lineWidth = this.width
-        dm.ct.moveTo(this.x, this.lastY)
+        dm.pr.lineWidth = this.width
+        dm.pr.moveTo(this.x, this.lastY)
         this.lastY += this.distanceInterval * Math.random()
         this.x += (Math.random()-0.5) * this.surfaceRoughness
-        dm.ct.lineTo(this.x, this.lastY)
-        dm.ct.stroke()
-        dm.ct.closePath()
-        dm.ct.lineWidth = this.wb.width
-        dm.ct.strokeStyle = dm.currentTool.color //віддаємо контексту його попередній колір, шоб фарби ну, не тойво
+        dm.pr.lineTo(this.x, this.lastY)
+        dm.pr.stroke()
+        dm.pr.closePath()
+        dm.pr.lineWidth = this.wb.width
+        dm.pr.strokeStyle = dm.currentTool.color //віддаємо контексту його попередній колір, шоб фарби ну, не тойво
     }
 
     stopRunning(){
@@ -436,7 +443,7 @@ class ClipTool extends DrawingTool {
     }
 
     onDown(){
-        //this.dm.ct.save()
+        //this.dm.pr.save()
     }
 
     onDraw() {
@@ -454,14 +461,14 @@ class ClipTool extends DrawingTool {
     }
 
     onUp() {
-        this.dm.ct.clip(this.path);
+        this.dm.pr.clip(this.path);
         this.dm.currentTool = this.dm.drawingTools["Pen"];
-        this.dm.ct.strokeStyle = this.color;
+        this.dm.pr.strokeStyle = this.color;
         this.path = new Path2D(); // Очищення шляху
     }
 
     updateTool() {
-        this.dm.ct.strokeStyle = this.color;
+        this.dm.pr.strokeStyle = this.color;
         this.dm.pr.strokeStyle = "#FFFFFF" //setRGB(255, 0, 0);
     }
 
