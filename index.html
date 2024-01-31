@@ -4,9 +4,6 @@
     <link rel="stylesheet" type="text/css" href="styles/sketch.css">
     <link rel="shortcut icon" href="https://i.pinimg.com/originals/7c/43/0b/7c430ba6fb3cd7058aec52cb84a080e6.png" type="image/x-icon">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css"/>
-    <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
 </head>
 
 <body onselectstart="return false">
@@ -26,17 +23,16 @@
     </div>
     <div class="page">
     <div class="nav" id="sideBar" onselectstart="return false">
+        <button id="close_button" class="close-button" accesskey="esc"><img src="icons/close.png" class="icon"></button>
         <div class="section">
-            <button id="close_button" class="close-button" accesskey="esc"><img src="icons/close.png" class="icon"></button>
-
             <div class="colors-section">
                 <!--<input id="color_input" style="visibility: hidden;" data-coloris>-->
                 <input class="userColor" type="color" id="color-input" title="Pen color" value="#000000">
                 <button id="palette_button" class="userColor" title="Color palettes"><img src="icons/palette.png" class="icon"></button>
             </div>
 
-            <input type="range" class="slider" min="0" max="100" value="100" id="transparency_slider" title="Transparency of pen">
-            <label for="transparency_slider" id="transparency_slider_label"></label>
+            <!--<input type="range" class="slider" min="0" max="100" value="100" id="transparency_slider" title="Transparency of pen">
+            <label for="transparency_slider" id="transparency_slider_label"></label>-->
         </div>
         <div class="section">
             <button id="undo_button" title="Undo" class="undoredo"><img src="icons/undo.png" class="icon"></button>
@@ -48,6 +44,28 @@
             <!--<p><b>Settings</b></p>-->
             <button id="settings_button" class="settings_button" title="Settings"><img src="icons/parameters.png" class="icon"></button>
             <button id="tips_button" class="settings_button" title="Tips"><img src="icons/tips.png" class="icon"></button>
+        </div>
+        <div class="section" style="display: flex;">
+            <div class="small-button" id="stroke-button"><img src="icons/curve.png" class="small-icon"></div>
+            <div id="stroke-options" class="hoverable">
+                <div class="section">
+                    <input type="checkbox" id="smoothCheckbox" checked><label for="allowSmoothing">Smooth stroke</label>
+                </div>
+                <div class="section">
+                    <input type="number" name="" min="0" max="1" step="0.1" value="0.2" id="smoothFactorInput"><label for="smoothFactorInput">Smooth factor</label>
+                </div>
+            </div>
+            <div class="small-button" id="selection-button"><img src="icons/area.png" class="small-icon"></div>
+            <div id="selection-options" class="hoverable">
+                <div id="reset-clip" class="option">
+                    <p>Reset Selection</p>
+                </div>
+            </div>
+            <div class="small-button" id="filters-button"><img src="icons/function.png" class="small-icon""></div>
+            <div id="filters-options" class="hoverable">
+        
+            </div>
+
         </div>
         <div class="section" id="tools-section">
             <!--Drawing tools as scrollable list-->
@@ -93,7 +111,7 @@
             <h3 style="display: inline-block;">Custom palette</h3>
             <button id="add_to_palette" style="display: inline-block;"><img src="icons/plus.png"></button>
         </div>
-        <div class="palette_cell_container" id="custom_palette">
+        <div class="palette-cell-container" id="custom_palette">
             
         </div>
 
@@ -119,12 +137,30 @@
             <img src="icons/plus.png" width="20" alt="">
             <p>Add a layer</p>
         </div>
-        <div style="height: 90%; overflow-y: scroll; overflow-x: clip;">
+        <div style="height: 80%; overflow-y: scroll; overflow-x: clip;">
             <ol type="1" class="section" id="layer-list">
 
             </ol>
         </div>
+        <div class="layer-properties">
+            <p>Layer opacity</p>
+            <input type="range" id="layerOpacityInput" min="0" max="1" step="0.01" value="1" class="slider">
+            <label for="layerOpacityInput" id="layerOpacityLabel">1</label>
+        </div>
 
+    </div>
+
+    <!-- Display width -->
+    
+    <div id="pen-width-container">
+        <div id="displayPenWidth">
+            <div style="position: fixed;
+            width: 100%;
+            height: 100%;
+            border: 1px solid black;
+            border-radius: 50%;">
+            </div>
+        </div>
     </div>
 
 </div>

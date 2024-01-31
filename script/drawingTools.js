@@ -79,6 +79,8 @@ class DrawingTool {
         title.innerHTML = toolType.constructor.name
 
         Object.entries(toolType).forEach(([key, value]) => {
+            let penWidthCircle = dgid("displayPenWidth")
+            let ct = dgid("pen-width-container")
             if (typeof value === 'number') {
                 let innerContainer = dcel("div", container)
                 innerContainer.classList = "slider-field"
@@ -93,6 +95,8 @@ class DrawingTool {
 
                 slider.style.width = "50%"
                 slider.value = value
+
+                slider.classList.add("slider")
     
                 let label = document.createElement('label')
                 label.textContent = key
@@ -105,7 +109,16 @@ class DrawingTool {
                 slider.addEventListener('input', function() {
                     toolType[key] = parseFloat(this.value)
                     val.innerHTML = this.value.toString()
+                    if (key == "width"){
+                        ct.style.display = "flex"
+                        penWidthCircle.style.width = val.innerHTML + "px"
+                        penWidthCircle.style.height = val.innerHTML + "px"
+                    }
                 });
+
+                slider.addEventListener("mouseup", () => {
+                    ct.style.display = "none"
+                })
 
             }
         });
@@ -185,7 +198,7 @@ class Eraser extends DrawingTool {
 class Bridge extends DrawingTool {
     constructor(dm, title) {
         super(dm, title);
-        this.width = 0.5
+        this.width = 1
         this.connectivity_range = 100
         this.bridge_density = 2
         this.lineOpacity = 0.9
@@ -207,16 +220,16 @@ class Bridge extends DrawingTool {
             this.dm.pr.stroke()
             this.dm.pr.closePath()
     
-            let dx = this.dm.pointArray[i][0]-this.dm.curX
-            let dy = this.dm.pointArray[i][1]-this.dm.curY
+            let dx = this.dm.pointArray[i].x-this.dm.curX
+            let dy = this.dm.pointArray[i].y-this.dm.curY
             let d = dx * dx + dy * dy;
             if ((d < this.connectivity_range*this.connectivity_range) && (i % this.bridge_density == 0)){
                 this.dm.pr.strokeStyle = setHexRGBA(this.color, this.bridgesOpacity)
                 let odx = dx*(this.line_offset/10)
                 let ody = dy*(this.line_offset/10)
                 this.dm.pr.beginPath()
-                this.dm.pr.moveTo((this.dm.curX > this.dm.pointArray[i][0])?(this.dm.curX+odx):(this.dm.curX-odx), (this.dm.curY > this.dm.pointArray[i][1])?(this.dm.curY+ody):(this.dm.curY-ody))
-                this.dm.pr.lineTo((this.dm.curX > this.dm.pointArray[i][0])?(this.dm.pointArray[i][0]-odx):(this.dm.pointArray[i][0]+ody), (this.dm.curY > this.dm.pointArray[i][1])?(this.dm.pointArray[i][1]-ody):(this.dm.pointArray[i][1]+ody))
+                this.dm.pr.moveTo((this.dm.curX > this.dm.pointArray[i].x)?(this.dm.curX+odx):(this.dm.curX-odx), (this.dm.curY > this.dm.pointArray[i].y)?(this.dm.curY+ody):(this.dm.curY-ody))
+                this.dm.pr.lineTo((this.dm.curX > this.dm.pointArray[i].x)?(this.dm.pointArray[i].x-odx):(this.dm.pointArray[i].x+ody), (this.dm.curY > this.dm.pointArray[i].y)?(this.dm.pointArray[i].y-ody):(this.dm.pointArray[i].y+ody))
                 this.dm.pr.stroke();
                 this.dm.pr.closePath()
             }
@@ -473,6 +486,7 @@ class ClipTool extends DrawingTool {
     }
 
     detailedUI(){
+        /*
         let b = dgid(this.title + "-button").querySelector(".tool-additional")
         b.innerHTML += `<p id="reset-clip" style="    position: absolute;
         right: 0px;
@@ -481,6 +495,7 @@ class ClipTool extends DrawingTool {
         background-color: #555555;
         padding: 5px;
         z-index: 10;">Reset</p>`
+        */
         dgid("reset-clip").addEventListener("click", () => {
             this.dm.pr.clearRect(0, 0, this.dm.preview.width, this.dm.preview.height);
             this.dm.clearSelectionArea()

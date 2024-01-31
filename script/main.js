@@ -72,12 +72,13 @@ class Layer{
         this.canvas = document.createElement("canvas")
         this.canvas.id = order
         this.canvas.style.opacity = "1"
+        this.opacity = 1
         if (activeLayer != null)
             activeLayer.insertAdjacentElement("afterend", this.canvas)
         else dgid("layers").insertBefore(this.canvas, dgid("preview"));
         this.canvas.width = window.innerWidth - 400
         this.canvas.height = window.innerHeight - 200
-
+        this.canvas.style.opacity = this.opacity.toString()
         this.ct = this.canvas.getContext("2d", {willReadFrequently:true})
         this.ct.save();
     }
@@ -136,10 +137,10 @@ class DrawingMachine {
         this.pr = this.preview.getContext("2d");
         this.pr.save()
 
-        this.layers = {layer1: {id:this.baseId, canvas: this.canvas, ct: this.ct}}
+        this.layers = {layer1: {id:this.baseId, canvas: this.canvas, ct: this.ct, opacity: 1}}
         this.pointArray = []
 
-        this.addLayerButton({order: this.baseId, zIndex: 10, canvas: this.canvas, ct: this.ct})
+        this.addLayerButton({order: this.baseId, zIndex: 10, canvas: this.canvas, ct: this.ct, opacity: 1})
 
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
@@ -268,9 +269,11 @@ class DrawingMachine {
 
     toolUp(ev){
         this.pointArray.push({x: this.curX, y: this.curY})
-
+        if (this.smooth && this.currentTool.title != "Waterbrush"){
+            this.clearPreviewCanvas()
+            this.replayStroke()            
+        }
         this.previewCanvasToMainCanvas()
-        //this.clearPreviewCanvas()
 
         this.is_drawing = false
         this.endX = ev.clientX
@@ -278,7 +281,7 @@ class DrawingMachine {
         //this.pr.closePath()
         //this.pr.closePath()
         this.currentTool.onUp()
-        this.replayStroke()
+        
         dgid("thumbnail-" + this.canvas.id).src = this.canvas.toDataURL()
     }
 
@@ -358,6 +361,21 @@ class DrawingMachine {
 
         dgid("menu_button").addEventListener("click", () => { this.switchFoldingOfElement("sideBar", "nav")})
         dgid("settings_button").addEventListener("click", () => {this.switchFoldingOfElement("settingsBar", "nav")})
+        let smoothCheckbox = dgid("smoothCheckbox")
+        this.smooth = smoothCheckbox.checked
+        smoothCheckbox.addEventListener("click", () => {this.smooth = smoothCheckbox.checked})
+
+        dgid("smoothFactorInput").addEventListener("input", (ev) => {
+            this.smoothFactor = parseFloat(ev.target.value)
+        })
+
+        //layer properties
+        dgid("layerOpacityInput").addEventListener("input", (ev) => {
+            let o = ev.target.value
+            this.layers[this.canvas.id].opacity = parseFloat(o)
+            this.canvas.style.opacity = o
+            dgid("layerOpacityLabel").innerText = o
+        })
     }
 
     switchFoldingOfElement(id, foldingType){
@@ -397,7 +415,7 @@ class DrawingMachine {
             paletteCustom.forEach(palette_color => {
             palette_color.addEventListener("click", () => {
                 this.primarColor = palette_color.dataset.palette
-                dgid("color-1").value = palette_color.dataset.palette
+                dgid("color-input").value = palette_color.dataset.palette
             })    
         })
         })
@@ -506,22 +524,13 @@ class DrawingMachine {
             }
         })
 
-        //this.currentLayerId = l.order
-        //dgid("layer-" + this.canvas.id).classList.add("selected")
         this.selectLayer(l.order)
 
         this.supportLayerOrder(null)
 
         layerInfo.onclick = () => {
             if (dgid(layerInfo.dataset.id) == null) return
-
-            if (dgid("layer-" + this.canvas.id) != null)
-                dgid("layer-" + this.canvas.id).classList.remove("selected")
-            
-            //this.canvas.id = layerInfo.dataset.id
-            this.ct = this.layers[layerInfo.dataset.id].ct
-            this.canvas = this.layers[layerInfo.dataset.id].canvas
-            dgid("layer-" + this.canvas.id).classList.add("selected")
+            this.setLayer(layerInfo.dataset.id)
         }
     }
 
@@ -544,7 +553,6 @@ class DrawingMachine {
     }
 
     setLayer(id){
-        //this.currentLayerId = id
         this.canvas = this.layers[id].canvas
         this.ct = this.layers[id].ct
 
@@ -553,10 +561,18 @@ class DrawingMachine {
     }
 
     selectLayer(id){
+        let cur = dgid(id)
         Array.from(document.querySelectorAll(".layer-button")).forEach((el) => {el.classList.remove("selected")})
         dgid("layer-" + id).classList.add("selected")
-        //console.log("current layer #" + dgid(id))
+
+        let o = cur.style.opacity
+        this.layers[this.canvas.id].opacity = parseFloat(o)
+        this.canvas.style.opacity = o
+        dgid("layerOpacityInput").value = o
+        dgid("layerOpacityLabel").innerText = o
     }
+
+
 
     createButton(parent, name, datasetId, w, h){
         let b = document.createElement("div")
@@ -583,9 +599,9 @@ class DrawingMachine {
         });
     
         for (let c of canvases) {
-            //console.log(c.id + " " + c.style.zIndex)
-            if (parseInt(c.style.opacity) == 1)
-                sheetContext.drawImage(c, 0, 0)
+            sheetContext.globalAlpha = parseFloat(c.style.opacity)
+            sheetContext.drawImage(c, 0, 0)
+            sheetContext.globalAlpha = 1
         }
         let image = sheet.toDataURL("image/png")
         sheet.remove()
@@ -594,14 +610,10 @@ class DrawingMachine {
 
     replayStroke(){
         let points = this.smoothPath()
-        //this.pr.clearRect(0, 0, this.canvas.width, this.canvas.height)
         this.prevX = points[0].x; this.prevY = points[0].y;
-        //this.pr.moveTo(points[0].x, points[0].y)
-        //this.pr.strokeStyle = "#ff0000"
         for (let p of points) {
             this.curX = p.x; this.curY = p.y;
             this.currentTool.onDraw()
-            //this.pr.moveTo(p.x, p.y)
             this.prevX = p.x; this.prevY = p.y;
         }
     }

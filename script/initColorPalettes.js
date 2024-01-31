@@ -34,6 +34,6 @@ let palette = document.querySelectorAll(".palette")
         palette.forEach(palette_color => {
             palette_color.addEventListener("click", (event) => {
                 dm.primarColor = palette_color.dataset.palette
-                document.getElementById("color-1").value = palette_color.dataset.palette
+                document.getElementById("color-input").value = palette_color.dataset.palette
             })    
         })
