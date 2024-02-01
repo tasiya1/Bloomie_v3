@@ -37,25 +37,21 @@ class Theme{
         root.style.setProperty('--font-face', this.fontFace);
         root.style.setProperty('--accent-color', this.accent);
         root.style.setProperty('--void-color', this.voidColor);
-        let ics = Array.from(document.querySelectorAll(".switchable"))
+        
         if (this.type == "light"){
-            for (let i of ics){
-                i.classList.remove("invert")
-            }
-        } else {
-            for (let i of ics){
-                i.classList.add("invert")
-            }           
-        }
+            root.style.setProperty('--theme-icons-mod', "invert(0)");
+        } else root.style.setProperty('--theme-icons-mod', "invert(1)");
+
     }
 }
 
 let base = new Theme("Sakura", "light", "#f1c5c5b5", "#ff9e9eb5", "#434343", "Overpass, Verdana", "#ffe5e5", "#434343")
 new Theme("Print", "light", "#f5f5f5de", "#b5b5b5ab", "#0c3b21", "Corbel", "#383838", "#434343")
-new Theme("Sun Bright", "light", "#ffaf00cc", "#ff1a0685", "#eaeaea", "Century Gothic", "#434343", "#434343")
-new Theme("Deep", "dark", "#141414e6", "#3dd2f0b5", "#f2f2f2", "Overpass, Candara", "#8fecff", "#434343")
-new Theme("Neon", "dark", "#080808d6", "#0023bd38", "#00ff00", "Consolas", "#00ff00", "#434343")
 new Theme("Book Shelf", "light", "#fbe5d5", "#ffa13d70", "#442813", "Tahoma", "#fff8f0", "#434343")
 new Theme("Mint", "light", "#d5fbeade", "#00a38073", "#0c3b21", "Verdana", "#f0fff8", "#434343")
+new Theme("Vampire", "dark", "#181818f5", "#8e072f3b", "#b90014", "Candara", "#8a8a8a", "#434343")
+new Theme("Deep", "dark", "#141414e6", "#3dd2f0b5", "#f2f2f2", "Overpass, Candara", "#8fecff", "#434343")
+new Theme("Neon", "dark", "#080808d6", "#0023bd38", "#00ff00", "Consolas", "#00ff00", "#434343")
+new Theme("Sun Bright", "light", "#ffaf00cc", "#ff1a0685", "#eaeaea", "Century Gothic", "#434343", "#434343")
 
 base.setTheme()

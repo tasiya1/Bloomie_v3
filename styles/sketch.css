@@ -5,23 +5,26 @@
 
 :root {
   --theme-title: "Sakura";
-  -theme-type: "light";
+  --theme-type: "light";
   --main-color: #f1c5c5b5; /*#2b5a6db7*/
   --highlight-color: #ff9e9eb5;
   --font-color: #434343;
   --font-face: Verdana;
   --accent-color: #ffe5e5;
   --void-color: #434343;
+  --theme-icons-mod: invert(0);
 }
 
 body {
   font-family: var(--font-face);
   color: var(--font-color);
   background-color: var(--void-color);
+  font-weight: 600;
 }
 
 textarea {
   font-family: var(--font-face);
+  color: var(--font-color);
 }
 
 input[type="color"] {
@@ -120,9 +123,10 @@ h3{
   float: right;
   padding: 0;
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 15px;
+  right: 15px;
   margin: 10px;
+  z-index: 1;
 }
 
 .nav{
@@ -170,11 +174,7 @@ h3{
 }
 
 .switchable {
-
-}
-
-.invert {
-  filter: invert();
+  filter: var(--theme-icons-mod);
 }
 
 .floating-bar {
@@ -282,14 +282,19 @@ h3{
   display: inline-flexbox;
 }
 
-.menuButton{
-  position:fixed;
+#menu_button{
+  position: fixed;
   z-index: 5;
-  top: 0;
-  left: 0;
-  padding-top: 0px;
+  top: 10px;
+  left: 10px;
   transition: duration 0ms;
-  background-color: rgba(0,0,0,0);
+  background-color: var(--main-color);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .icon{
@@ -670,6 +675,36 @@ p:hover{
   position: relative;
   /* overflow: clip; */
   border: 1px solid white;
+}
+
+.footer {
+  border-top: 1px solid gray;
+  padding-top: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-contents {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+}
+
+.footer-contents * {
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+}
+
+.footer-contents p {
+  border-right: 2px lightgray solid;
+}
+
+.footer a:active, footer a:visited{
+  color: gray;
 }
 
 .colors-section {

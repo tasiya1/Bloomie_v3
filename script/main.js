@@ -514,7 +514,8 @@ class DrawingMachine {
         let opt = this.createButton(right, "options", l.order, 20, 20)
         opt.classList.add("layer-option-button", "small-button")
         let hov = dcel("div", right)
-        hov.classList.add("hoverable", "switchable")
+        opt.querySelector("img").classList.add("switchable")
+        hov.classList.add("hoverable")
 
         let sec = dcel("div", hov); sec.classList.add("section")
 

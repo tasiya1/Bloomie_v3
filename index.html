@@ -8,9 +8,6 @@
 </head>
 
 <body onselectstart="return false">
-    <img id="project-cheese" src="'data:image/jpeg;base64,' + ${project.encodedImageData}" alt="Project Image" width="300" height="200" style="object-fit: cover;" hidden>
-    <p id="project-id" th:text="${project.id}" hidden></p>
-
     <div class="backdrop" id="canvas-size-window">
         <div class="option-window">
             <h1>Enter a size of the canvas</h1>
@@ -72,7 +69,7 @@
             <!--Drawing tools as scrollable list-->
             <div style="display: flex; justify-content: flex-start;">
                 <h3 style="display: inline-block">Tools</h3>
-                <div id="showBrushes" style="display: inline-block"><img src="icons/settings.png" height="30" width="30"></div>
+                <div id="showBrushes" style="display: inline-block"><img src="icons/settings.png" height="30" width="30" class="switchable"></div>
             </div>
             <div id="tools-container">
 
@@ -107,6 +104,13 @@
             <p>Tips</p><div class="key"><p>Q</p></div>
             <p>Save as Image</p><div class="key"><p>Ctrl</p>+<p>S</p></div>
         </div>
+        <div class="section">
+            <footer class="footer">
+                <div class="footer-contents">
+                    <p>Created by tasiya1</p><a href="https://github.com/tasiya1/Bloomie_v3" target="_blank">GitHub Repo<img src="icons/external-link.svg" class="switchable" width="15px" height="15px"></a>
+                </div>
+            </footer>
+        </div>
 
     </div>
 
@@ -128,7 +132,7 @@
     </div>
 
 
-    <span class="menuButton"><button id="menu_button" title="Show menu"><img src="icons/menu.png" class="icon"></button></span>
+    <span class="menuButton"><button id="menu_button" title="Show menu"><img src="icons/menu.png" class="icon switchable"></button></span>
 
     <div class="canvas-container" style="position: relative;">
         <div id="layers">

@@ -48,7 +48,7 @@ class DrawingTool {
         tool.id = title + "-button"
         tool.dataset.name = title
         tool.innerHTML += `<div class="tool-body">
-        <div title="`+ title +`"><img src="icons/` + title.toLowerCase() +`.png" class="icon"></div>
+        <div title="`+ title +`"><img src="icons/` + title.toLowerCase() +`.png" class="icon switchable"></div>
         <p>` + title +`</p>
         </div><div class="tool-additional"></div>`
         container.appendChild(tool)
