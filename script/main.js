@@ -500,6 +500,7 @@ class DrawingMachine {
         else dgid("layer-list").appendChild(layerInfo)
 
         let visi = this.createButton(right, "visibility", l.order, 20, 20)
+        visi.classList.add("switchable")
         visi.addEventListener("click", () => {
             if (parseInt(dgid(visi.dataset.id).style.opacity) == 1){
                 dgid(visi.dataset.id).style.opacity = "0"
@@ -513,7 +514,7 @@ class DrawingMachine {
         let opt = this.createButton(right, "options", l.order, 20, 20)
         opt.classList.add("layer-option-button", "small-button")
         let hov = dcel("div", right)
-        hov.classList.add("hoverable")
+        hov.classList.add("hoverable", "switchable")
 
         let sec = dcel("div", hov); sec.classList.add("section")
 

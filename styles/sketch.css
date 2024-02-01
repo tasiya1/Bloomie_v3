@@ -3,14 +3,25 @@
   padding: 0;
 }
 
+:root {
+  --theme-title: "Sakura";
+  -theme-type: "light";
+  --main-color: #f1c5c5b5; /*#2b5a6db7*/
+  --highlight-color: #ff9e9eb5;
+  --font-color: #434343;
+  --font-face: Verdana;
+  --accent-color: #ffe5e5;
+  --void-color: #434343;
+}
+
 body {
-  font-family: Overpass, "Candara";
-  color: #eaeaea;
-  background-color: #434343;
+  font-family: var(--font-face);
+  color: var(--font-color);
+  background-color: var(--void-color);
 }
 
 textarea {
-  font-family: Overpass, "Candara";
+  font-family: var(--font-face);
 }
 
 input[type="color"] {
@@ -72,7 +83,7 @@ canvas {
 }
 
 .selected, .selected:hover, .layer-button.selected:hover {
-  background-color: #ff9e9eb5;
+  background-color: var(--highlight-color);
   transition: background-color 1s ease;
 }
 /*
@@ -123,7 +134,7 @@ h3{
   left: 0;
   /*background-image: url(design/background.png);*/
   /*background: #0000008a;*/
-  background-color: #2b5a6db7;
+  background-color: var(--main-color);
   backdrop-filter: blur(10px);
   overflow-y: scroll;
   padding: 20px;
@@ -151,11 +162,19 @@ h3{
 }
 
 .key p {
-  border: 1px solid pink;
+  border: 1px solid var(--accent-color);
   padding: 3px;
   margin: 10px;
   border-radius: 5px;
-  box-shadow: 2px 2px 0px 3px pink;
+  box-shadow: 2px 2px 0px 3px var(--accent-color);
+}
+
+.switchable {
+
+}
+
+.invert {
+  filter: invert();
 }
 
 .floating-bar {
@@ -167,7 +186,7 @@ h3{
   right: 50px;
   border-radius: 25px;
 /*   background: #0000008a; */
-  background-color: #2b5a6db7;
+  background-color: var(--main-color);
   backdrop-filter: blur(10px);
   overflow-x: hidden;
   padding: 20px;
@@ -215,10 +234,10 @@ h3{
 .layer-properties {
   display: flex;
   padding: 5px;
-  background-color: #2b5a6db7;
   margin: 5px;
   width: 100%;
-  position: relative;
+  position: absolute;
+  bottom: 5%;
 }
 
 .layer-properties .slider {
@@ -241,11 +260,11 @@ h3{
 }
 
 #tools-properties {
-  max-height: 250px;
+  max-height: 150px;
   padding: 5px;
   overflow-x: hidden;
   /*background-color: rgba(75, 75, 75, 0.598);*/
-  background-color: #2b5a6db7;
+  background-color: var(--main-color);
   margin: 5px;
 }
 
@@ -299,7 +318,6 @@ h3{
 }
 
 #layers-icon {
-  filter: invert();
   float: right;
   width: 20px;
   height: 20px;
@@ -385,7 +403,7 @@ button:hover, .small-button:hover{
   padding: 10px;
   border-radius: 5px;
   /* background-color: #0d0d0d79; */
-  background-color: #2b5a6db7;
+  background-color: var(--main-color);
   box-shadow: 5px 5px 6px 0px #0000003b;
 }
 
@@ -410,7 +428,7 @@ button:hover, .small-button:hover{
   width: 15px;
   height: 15px;
   border-radius: 50%; 
-  background:#548fa6;
+  background: var(--accent-color);
   cursor: pointer;
 }
 
@@ -435,11 +453,12 @@ button:hover, .small-button:hover{
   justify-items: flex-start;
   align-items: center;
   justify-content: space-between;
+  margin: 5px auto;
 }
 
 #tools-container{
   /* background-color: rgba(75, 75, 75, 0.598); */
-  background-color: #2b5a6db7;
+  background-color: var(--main-color);
   padding: 10px;
   display: flex;
   flex-wrap: nowrap;
@@ -450,7 +469,7 @@ button:hover, .small-button:hover{
 }
 
 .selected-tool, .selected-tool.tool:hover{
-  background-color: #ff9e9eb5;
+  background-color: var(--highlight-color);
 }
 
 .folded {
@@ -547,6 +566,45 @@ p:hover{
   border: none;
 }
 
+.theme-cell {
+  width: 100%;
+  height: 70px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-direction: row;
+  padding: 5px;
+  margin: 10px auto;
+}
+
+.theme-cell:hover {
+  border: 1px solid white;
+}
+
+.theme-title {
+}
+
+.theme-brush {
+  width: 10px;
+  height: 10px;
+}
+
+.highlight-color-cell {
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
+  margin-left: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.accent-color-cell {
+  height: 20px;
+  width: 5px;
+  margin-left: 5px;
+}
+
 .hoverable {
   display: none;
   background-color: #ffffffc5;
@@ -558,7 +616,8 @@ p:hover{
 }
 
 .hoverable .section {
-  border-bottom: 1px solid #2b5a6db7;
+  border-bottom: 1px solid var(--main-color);
+  font-size: 10pt;
 }
 
 .hoverable .section:last-of-type {
