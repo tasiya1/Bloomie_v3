@@ -4,13 +4,13 @@
 }
 
 body {
-  font-family: Overpass, "Candara Light";
+  font-family: Overpass, "Candara";
   color: #eaeaea;
   background-color: #434343;
 }
 
 textarea {
-  font-family: Overpass, "Candara Light";
+  font-family: Overpass, "Candara";
 }
 
 input[type="color"] {
@@ -284,7 +284,6 @@ h3{
 }
 
 .small-button {
-  background-color: #000000aa;
   border-radius: 50%;
   padding: 5px;
   width: 30px;
@@ -295,11 +294,19 @@ h3{
   margin: 5px;
 }
 
-#layers-icon, .delete-button{
+.solid-black {
+  background-color: #000000aa;
+}
+
+#layers-icon {
   filter: invert();
   float: right;
   width: 20px;
   height: 20px;
+}
+
+.layer-option-button {
+  display: inline-flex;
 }
 
 button{
@@ -545,7 +552,7 @@ p:hover{
   background-color: #ffffffc5;
   backdrop-filter: blur(10px);
   border-radius: 15px;
-  padding: 15px;
+  padding: 10px;
   color: #434343;
   animation: popOut .3s ease;
 }
@@ -565,6 +572,10 @@ p:hover{
   transform: translate(30px, 20px)
 }
 
+#layer-list .layer-button:only-child .hoverable * {
+  opacity: 0.7;
+}
+
 @keyframes popOut {
   0% {
     opacity: 0;
@@ -573,7 +584,7 @@ p:hover{
 
   100% {
     opacity: 1;
-    padding: 15px;
+    padding: 10px;
   }
 }
 

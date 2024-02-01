@@ -269,7 +269,7 @@ class DrawingMachine {
 
     toolUp(ev){
         this.pointArray.push({x: this.curX, y: this.curY})
-        if (this.smooth && this.currentTool.title != "Waterbrush"){
+        if (this.smooth && this.currentTool.title != "Waterbrush" && this.currentTool.title != "Bridge"){
             this.clearPreviewCanvas()
             this.replayStroke()            
         }
@@ -330,19 +330,7 @@ class DrawingMachine {
         dgid("clear").addEventListener("click", ()=> { this.ct.clearRect(0, 0, this.canvas.width, this.canvas.height) })
 
         dgid("color-input").addEventListener("input", (event) => {this.primarColor = event.target.value})
-        /*dgid("color-2").addEventListener("input", (event) => {this.minorColor = event.target.value})*/
-/*
-        Coloris({
-            el: '#color-input',
-            themeMode: 'light',
-            alpha: true,
-            format: 'hex',
-            formatToggle: true,
-            defaultColor: '#000000',
-            onChange: (color) => {this.setColor(color)}
-        });
-        document.onload = () => {document.querySelector("clr-field").addEventListener("click", () => {dgid("color-input").click()})}
-*/
+
         dgid("palette_button").addEventListener("click", () =>{this.switchFoldingOfElement("paletteBar", "nav")})
 
         //key reader
@@ -375,6 +363,7 @@ class DrawingMachine {
             this.layers[this.canvas.id].opacity = parseFloat(o)
             this.canvas.style.opacity = o
             dgid("layerOpacityLabel").innerText = o
+            dgid("thumbnail-" + this.canvas.id).style.opacity = o
         })
     }
 
@@ -394,15 +383,13 @@ class DrawingMachine {
         let updatedLayers = null
         if (ev != null) updatedLayers =  Array.from(ev.from.children);
         else updatedLayers = Array.from(dgid("layer-list").children)
-        //updatedLayers.shift()
-        //updatedLayers.pop()
 
-        for (let i = 0; i < updatedLayers.length; i++){
-            let l = updatedLayers[i]
+        let i = updatedLayers.length - 1
+        for (let l of updatedLayers){
             dgid(l.dataset.id).style.zIndex = i + 10
+            i--
         }
         console.log("Updated layers:", updatedLayers);
-    
     }
 
     initCustomPalette(){
@@ -458,6 +445,7 @@ class DrawingMachine {
     }
 
     addNewLayer(){
+        let prevId = this.canvas.id
         let l = new Layer(Date.now().toString(), this.canvas)
         //l.canvas.style.opacity = "1"
         l.canvas.width = this.canvas.width; l.canvas.height = this.canvas.height
@@ -465,10 +453,10 @@ class DrawingMachine {
         
         this.canvas = l.canvas
         this.ct = this.canvas.getContext("2d")
-        this.addLayerButton(l)
+        this.addLayerButton(l, prevId)
     }
 
-    addLayerButton(l){
+    addLayerButton(l, prevId){
         let thumbnail = this.canvas.toDataURL();
         let layerInfo = document.createElement("li")
 
@@ -504,14 +492,12 @@ class DrawingMachine {
         left.appendChild(vmist)
         layerInfo.appendChild(left)
         layerInfo.appendChild(right)
+        let curLayerButton = dgid("layer-" + prevId)
+        if (curLayerButton != null)
+            //dgid("layer-" + this.canvas.id).insertAdjacentElement("beforeend", layerInfo)
+            dgid("layer-list").insertBefore(layerInfo, curLayerButton);
 
-        if (dgid("layer-" + this.canvas.id) != null)
-            dgid("layer-" + this.canvas.id).insertAdjacentElement("afterend", layerInfo)
         else dgid("layer-list").appendChild(layerInfo)
-
-        let rembo = this.createButton(right, "delete", l.order, 20, 20)
-        rembo.classList.add("delete-button")
-        rembo.addEventListener("click", () => {this.switchLayer(rembo.dataset.id)})
 
         let visi = this.createButton(right, "visibility", l.order, 20, 20)
         visi.addEventListener("click", () => {
@@ -524,6 +510,20 @@ class DrawingMachine {
             }
         })
 
+        let opt = this.createButton(right, "options", l.order, 20, 20)
+        opt.classList.add("layer-option-button", "small-button")
+        let hov = dcel("div", right)
+        hov.classList.add("hoverable")
+
+        let sec = dcel("div", hov); sec.classList.add("section")
+
+        let rembo = this.createButton(sec, "delete", l.order, 20, 20, () => {this.switchLayer(rembo.dataset.id)}, "Remove layer")
+        rembo.classList.add("layer-option-button", "option")
+
+        let merge = this.createButton(sec, "merge", l.order, 20, 20, () => {this.mergeLayers(rembo.dataset.id)}, "Merge with bottom layer")
+        merge.classList.add("layer-option-button", "option")
+
+
         this.selectLayer(l.order)
 
         this.supportLayerOrder(null)
@@ -535,7 +535,9 @@ class DrawingMachine {
     }
 
     switchLayer(id){
-        let curIndex = dgid(id).style.zIndex
+        if (dgid("layer-list").children.length <= 1)
+            return
+
         dgid(id).remove()
         dgid("layer-" + id).remove()
         
@@ -549,7 +551,6 @@ class DrawingMachine {
             }
         }
         this.setLayer(closestLayer.id)
-
     }
 
     setLayer(id){
@@ -572,9 +573,14 @@ class DrawingMachine {
         dgid("layerOpacityLabel").innerText = o
     }
 
+    mergeLayers(id){
+        let order = this.canvas.style.zIndex
+        let layerImageData = this.canvas
+        this.switchLayer(id)
+        this.ct.drawImage(layerImageData, 0, 0)
+    }
 
-
-    createButton(parent, name, datasetId, w, h){
+    createButton(parent, name, datasetId, w, h, onClickFunction, sideLabel){
         let b = document.createElement("div")
         let img = document.createElement("img")
         img.src = "icons/" + name + ".png"
@@ -584,6 +590,14 @@ class DrawingMachine {
         b.id = name + "-button-" + datasetId
         b.dataset.id = datasetId
         parent.appendChild(b)
+        b.classList.add("button-label")
+
+        if (sideLabel != null){
+            let p = dcel("p", b)
+            p.innerText = sideLabel
+        }
+
+        b.onclick = onClickFunction
         return b
     }
 
