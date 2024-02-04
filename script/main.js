@@ -13,6 +13,10 @@ function dcel(tag, parent){
     return el
 }
 
+function onClicker(id, onClick){
+    document.getElementById(id).addEventListener("click", onClick)
+}
+
 function setRGB(r, g, b){
     return `rgb(${r},${g},${b})`
 }
@@ -104,7 +108,9 @@ class DrawingMachine {
         this.preview = dgid("preview")
 
         this.currentTool = null
-        //this.currentLayerId = this.baseId
+        this.canvasStateController = new CanvasStateController(this)
+        this.toSave = false
+
         this.canvas.style.zIndex = 10
         this.preview.style.zIndex = 120
         this.selectedButton = null
@@ -141,6 +147,9 @@ class DrawingMachine {
         this.pointArray = []
 
         this.addLayerButton({order: this.baseId, zIndex: 10, canvas: this.canvas, ct: this.ct, opacity: 1})
+
+        this.canvasStateController.saveState()
+        this.canvasStateController.tellButtonIsOrNotAvailable("undo", false)
 
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
@@ -249,8 +258,6 @@ class DrawingMachine {
 
         this.curX = ev.clientX - this.marginX
         this.curY = ev.clientY - this.marginY
-    
-        this.pointArray.push({x: this.curX, y: this.curY})
 
         if (this.prevX == null || this.prevY == null){
             this.prevX = ev.clientX
@@ -261,6 +268,7 @@ class DrawingMachine {
         if (this.is_drawing){
             //this.currentTool.dynamicDraw();
             this.currentTool.onDraw(ev);
+            this.pointArray.push({x: this.curX, y: this.curY})
         }
 
         this.prevX = this.curX
@@ -268,14 +276,25 @@ class DrawingMachine {
     }
 
     toolUp(ev){
-        this.pointArray.push({x: this.curX, y: this.curY})
+        this.toSave = false
+        if (this.is_drawing){
+            this.pointArray.push({x: this.curX, y: this.curY})
+            this.is_drawing = false
+            this.toSave = true
+        }
         if (this.smooth && this.currentTool.title != "Waterbrush" && this.currentTool.title != "Bridge"){
             this.clearPreviewCanvas()
             this.replayStroke()            
         }
         this.previewCanvasToMainCanvas()
 
-        this.is_drawing = false
+        if (this.toSave)
+            setTimeout(() => {
+                this.canvasStateController.saveState()
+            }, 100);
+            
+        this.toSave = false
+
         this.endX = ev.clientX
         this.endY = ev.clientY
         //this.pr.closePath()
@@ -327,7 +346,10 @@ class DrawingMachine {
     }
 
     initToolButtons(){
-        dgid("clear").addEventListener("click", ()=> { this.ct.clearRect(0, 0, this.canvas.width, this.canvas.height) })
+        dgid("clear").addEventListener("click", ()=> { 
+            this.ct.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.canvasStateController.saveState()
+         })
 
         dgid("color-input").addEventListener("input", (event) => {this.primarColor = event.target.value})
 
@@ -365,6 +387,10 @@ class DrawingMachine {
             dgid("layerOpacityLabel").innerText = o
             dgid("thumbnail-" + this.canvas.id).style.opacity = o
         })
+
+        //undo/redo aha
+        onClicker("undoButton", () => {this.canvasStateController.undo()})
+        onClicker("redoButton", () => {this.canvasStateController.redo()})
     }
 
     switchFoldingOfElement(id, foldingType){
@@ -417,6 +443,14 @@ class DrawingMachine {
         else if (e.ctrlKey && e.key === 's') {
             e.preventDefault();
             this.downloadImage()
+        }
+        else if (e.ctrlKey && e.key === 'z') {
+            e.preventDefault();
+            this.canvasStateController.undo()
+        }
+        else if (e.ctrlKey && e.key === 'y') {
+            e.preventDefault();
+            this.canvasStateController.redo()
         }
         else if (e.key == "m") {this.switchFoldingOfElement("sideBar", "nav")}
         else if (e.key == "p") {this.switchFoldingOfElement("paletteBar", "nav")}
@@ -626,6 +660,7 @@ class DrawingMachine {
 
     replayStroke(){
         let points = this.smoothPath()
+        if (points.length == 0) return
         this.prevX = points[0].x; this.prevY = points[0].y;
         for (let p of points) {
             this.curX = p.x; this.curY = p.y;
